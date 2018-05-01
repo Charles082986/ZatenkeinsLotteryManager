@@ -1,3 +1,0 @@
-ZLM_PackageHandler = {
-	
-};

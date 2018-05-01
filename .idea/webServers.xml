@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="cfb7913e-fb47-41fe-8890-4a6ca37dafa2" name="Zatenkein's WoW Path" url="http://localhost">
+        <fileTransfer port="0" mountedRoot="C:\Users\chuck.hunter\Documents" accessType="MOUNT" />
+      </webServer>
+    </option>
+  </component>
+</project>
