@@ -7,5 +7,5 @@
 ## Dependencies: Ace3
 
 ZatenkeinsLotteryManager.Core.lua
-ZatenkeinsLotteryManager.TallyWhackter.lua
+ZatenkeinsLotteryManager.TallyWhacker.lua
 ZatenkeinsLotteryManager.PackageHandler.lua

@@ -12,7 +12,6 @@ function ZLM_LotteryManager:RunLottery(startTime,endTime)
 	ZLM_LotteryManager:UpdateScoreboard(startTime,endTime);	
 	local lotteryMethod = ZLM_Options.LotteryMethod;
 	local lotteryWinnerCount = ZLM_Options.NumberOfWinners;
-	local predeterminedPrizes = ZLM_Options.usePredeterminedPrizes;
 	local winners = {};
 	if lotteryMethod == ZLM_LotteryManager.LotteryMethod.Competition then
 		winners = self:GetCompetitionWinners(lotteryWinnerCount)
@@ -23,7 +22,7 @@ function ZLM_LotteryManager:RunLottery(startTime,endTime)
 end
 
 function ZLM_LotteryManager:UpdateScoreboard(startTime,endTime)
-	donations = ZLM_TallyWhacker:GetDonationsWithinTimeframe(startTime,endTime);
+	local donations = ZLM_TallyWhacker:GetDonationsWithinTimeframe(startTime,endTime);
 	local scoreboard = {};
 	for i = 1,#(donations),1 do
 		local donation = donations[i];
@@ -35,13 +34,13 @@ function ZLM_LotteryManager:UpdateScoreboard(startTime,endTime)
 	end
 	ZLM_LotteryManager.Scoreboard = {};
 	ZLM_LotteryManager.ScoreboardTotal = 0;
-	for k,v in pairs(scoreboard) do
+	for _,v in pairs(scoreboard) do
 		ZLM_LotteryManager.TotalPoints = ZLM_LotteryManager.TotalPoints + v.Points;
 		tinsert(ZLM_LotteryManager.Scoreboard,v);
 	end
 	sort(ZLM_LotteryManager.Scoreboard,ZLM_SortScoreboard);
 end
-function ZLM_LotteryManager:GetRollWinners(winnerCount,exclusiveWinners)
+function ZLM_LotteryManager:GetRollWinners(winnersCount,exclusiveWinners)
 	local winners = {};
 	if exclusiveWinners == nil then exclusiveWinners = true; end
 	while #(winners) < winnersCount do
@@ -59,7 +58,7 @@ function ZLM_LotteryManager:GetRollWinners(winnerCount,exclusiveWinners)
 	end
 	return winners;
 end
-function ZLM_LotteryManager:GetCompetitionWinners(winnerCount)
+function ZLM_LotteryManager:GetCompetitionWinners(winnersCount)
 	local winners = {};
 	for i = 1,winnersCount do
 		tinsert(winners,ZLM_Scoreboard[i]);

@@ -24,7 +24,7 @@ function ZLM_TallyWhacker:RecordDonation(nameRealmCombo,itemId,quantity) -- Add 
 end
 
 function ZLM_TallyWhacker:Purge(timeString) -- Purge all DonationLog records before a specific time.
-	local purgeTime = 0;
+	local purgeTime;
 	if not not time then
 		purgeTime = ZLM_ConverteStringToTime(timeString);
 	else
@@ -32,7 +32,7 @@ function ZLM_TallyWhacker:Purge(timeString) -- Purge all DonationLog records bef
 	end
 	for i = #(self.DonationLog),1,-1 do
 		local entry = self.DonationLog[i];
-		if entry.Timestamp < time then
+		if entry.Timestamp < purgeTime then
 			tremove(self.DonationLog,i);
 		end
 	end
