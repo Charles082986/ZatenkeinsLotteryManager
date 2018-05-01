@@ -119,21 +119,14 @@ function ZLM_Contains(table,property,value)
 end
 
 function ZLM_GetTieResults(winners)
-	local results = {};
 	local pendingResults = {};
-	for i = 1,#(winners) do
-		local winner = winners[i];
-		local winner2 = winners[i+1];
-		pendingResults[i] = winner;
-		if winner2 == nil or winner.Points ~= winner2.Points then
-			local key = "";
-			local value = {};
-			for k,v in pairs(pendingResults) do
-				if key ~= nil and key ~= "" then key = key .. ", "; end
-				key = key .. k;
-				tinsert(value,v);
-			end
-			results[key] = value;
-		end
-	end
+	for _,v in ipairs(winners) do
+        local record = pendingResults[v.Points];
+        if not not record then
+            pendingResults[v.Points] = v.Name;
+        else
+            pendingResults[v.Points] = record .. ", " .. v.Name
+        end
+    end
+    return pendingResults;
 end
