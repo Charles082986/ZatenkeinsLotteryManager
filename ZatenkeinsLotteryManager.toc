@@ -1,11 +1,10 @@
 ## Interface: 70300
-## Title: Zatenkein's Lottery manager
-## Notes: Manages a Item-Based Guild Lottery
-## Author: Zatenkein@Shadow Council
+## Title: ZatenkeinsLotteryManager
+## Notes: Manages an Item-Based Guild Lottery
+## Author: Zatenkein
 ## Version: 1.0
-## SavedVariables: ZLM_TallyWhacker, ZLM_Options
-## Dependencies: Ace3
+## SavedVariables: ZatenkeinsLotteryManagerDB
 
-ZatenkeinsLotteryManager.Core.lua
-ZatenkeinsLotteryManager.TallyWhacker.lua
-ZatenkeinsLotteryManager.PackageHandler.lua
+embeds.xml
+
+Core.lua
