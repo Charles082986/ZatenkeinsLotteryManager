@@ -1,5 +1,5 @@
 ZLM_DatePicker = {};
-function ZLM_DatePicker:new(controlKey,minYear,maxYear,includeTime,onValueChangedCallback,AceGUI)
+function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueChangedCallback,defaultValue,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     --BEGIN: Create Parent Frame
     local frame = AceGUI:Create("SimpleGroup");
@@ -30,17 +30,17 @@ function ZLM_DatePicker:new(controlKey,minYear,maxYear,includeTime,onValueChange
         tinsert(daysOrder,i);
     end
     local baseSize = 0.23;
-    local yearsDropdown = ZLM_DatePicker:CreateDropDown(years,yearsOrder,baseSize,controlKey,"year",onValueChangedCallback);
-    local monthsDropdown = ZLM_DatePicker:CreateDropDown(months,monthsOrder,baseSize,controlKey,"month",onValueChangedCallback);
-    local daysDropdown = ZLM_DatePicker:CreateDropDown(days,daysOrder,baseSize,controlKey,"day",onValueChangedCallback);
+    local yearsDropdown = ZLM_DatePicker:CreateDropDown(years,yearsOrder,baseSize,controlKey,"year",onValueChangedCallback,defaultValue.year);
+    local monthsDropdown = ZLM_DatePicker:CreateDropDown(months,monthsOrder,baseSize,controlKey,"month",onValueChangedCallback,defaultValue.month);
+    local daysDropdown = ZLM_DatePicker:CreateDropDown(days,daysOrder,baseSize,controlKey,"day",onValueChangedCallback,defaultValue.day);
     --END: CREATE DROPDOWNS
     --BEGIN: ADD DROPDOWNS TO PARENT
-    dateFrame:AddChild(ZLM_Header:new("Start Date",AceGUI));
-    dateFrame:AddChild(ZLM_Label:new("Year:",0.1,AceGUI));
+    frame:AddChild(ZLM_Heading:new(name,AceGUI));
+    dateFrame:AddChild(ZLM_Label:new(" Yr:",0.1,AceGUI));
     dateFrame:AddChild(yearsDropdown);
-    dateFrame:AddChild(ZLM_Label:new("Month:",0.1,AceGUI));
+    dateFrame:AddChild(ZLM_Label:new(" Mth:",0.1,AceGUI));
     dateFrame:AddChild(monthsDropdown);
-    dateFrame:AddChild(ZLM_Label:new("Date:",0.1,AceGUI));
+    dateFrame:AddChild(ZLM_Label:new(" Day:",0.1,AceGUI));
     dateFrame:AddChild(daysDropdown);
     --END: ADD DROPDOWNS TO PARENT
     frame:AddChild(dateFrame);
@@ -61,16 +61,16 @@ function ZLM_DatePicker:new(controlKey,minYear,maxYear,includeTime,onValueChange
             sixty[i] = i;
             tinsert(sixtyOrder,i);
         end
-        local hoursDropdown = ZLM_DatePicker:CreateDropDown(hours,hoursOrder,baseSize,controlKey,"hour",onValueChangedCallback);
-        local minutesDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"minute",onValueChangedCallback);
-        local secondsDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"sec",onValueChangedCallback);
+        local hoursDropdown = ZLM_DatePicker:CreateDropDown(hours,hoursOrder,baseSize,controlKey,"hour",onValueChangedCallback, defaultValue.hour);
+        local minutesDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"minute",onValueChangedCallback, defaultValue.minute);
+        local secondsDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"sec",onValueChangedCallback, defaultValue.sec);
         --END: CREATE TIME DROPDOWNS
         --BEGIN: ADD TIME DROPDOWNS TO PARENT
-        dateFrame:AddChild(ZLM_Label:new("H:",0.1,AceGUI));
+        timeFrame:AddChild(ZLM_Label:new(" Hr:",0.1,AceGUI));
         timeFrame:AddChild(hoursDropdown);
-        dateFrame:AddChild(ZLM_Label:new("M:",0.1,AceGUI));
+        timeFrame:AddChild(ZLM_Label:new(" Min:",0.1,AceGUI));
         timeFrame:AddChild(minutesDropdown);
-        dateFrame:AddChild(ZLM_Label:new("S:",0.1,AceGUI));
+        timeFrame:AddChild(ZLM_Label:new(" Sec:",0.1,AceGUI));
         timeFrame:AddChild(secondsDropdown);
         --END: ADD TIME DROPDOWNS TO PARENT
         frame:AddChild(timeFrame);
@@ -78,13 +78,16 @@ function ZLM_DatePicker:new(controlKey,minYear,maxYear,includeTime,onValueChange
     return frame;
 end
 
-function ZLM_DatePicker:CreateDropDown(values,order,width,controlKey,callbackKey,callback)
+function ZLM_DatePicker:CreateDropDown(values,order,width,controlKey,callbackKey,callback,defaultValue)
     local AceGUI = LibStub("AceGUI-3.0");
     local datepicker = AceGUI:Create("Dropdown");
     if not not order then
         datepicker:SetList(values,order);
     else
         datepicker:SetList(values);
+    end
+    if not not defaultValue then
+        datepicker:SetValue(defaultValue);
     end
     datepicker:SetRelativeWidth(width);
     datepicker:SetCallback("OnValueChanged",function(_,_,key,_)

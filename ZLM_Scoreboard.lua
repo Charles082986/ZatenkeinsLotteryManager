@@ -1,5 +1,5 @@
 ZLM_Scoreboard = {};
-function ZLM_Scoreboard:new(title,recalculateCallback,getWinnersCallback,dateChangeCallback,AceGUI)
+function ZLM_Scoreboard:new(title,recalculateCallback,getWinnersCallback,dateChangeCallback,startDateTimeDatePickerObject,endDateTimeDatePickerObject,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     --BEGIN: Creating the primary Scoreboard frame.
     local topContainer = AceGUI:Create("Frame");
@@ -24,14 +24,26 @@ function ZLM_Scoreboard:new(title,recalculateCallback,getWinnersCallback,dateCha
     getWinnersButton:SetRelativeWidth(0.5);
     --END: Creating the buttons.
     --BEGIN: Creating Datepickers
-    local startDateDatePicker = ZLM_DatePicker:new("ScoreboardStartDate",2018,date("%Y"),true,dateChangeCallback);
-    local endDateDatePicker = ZLM_DatePicker:new("ScoreboardEndDate",2018,date("%Y"),true,dateChangeCallback);
+    local startDateDatePicker = ZLM_DatePicker:new("Start Date","ScoreboardStartDateTime",2018,date("%Y"),true,dateChangeCallback,startDateTimeDatePickerObject,AceGUI);
+    local endDateDatePicker = ZLM_DatePicker:new("End Date","ScoreboardEndDateTime",2018,date("%Y"),true,dateChangeCallback,endDateTimeDatePickerObject,AceGUI);
     --END: Creating Datepickers
+    --BEGIN: Creating Table
+    local tableObj = ZLM_Table:new({
+        Rank = 0.1,
+        Name = 0.375,
+        Points = 0.25,
+        Min = 0.15,
+        Max = 0.15
+    },AceGUI)
+    --END: Creating Table
     buttonContainer:AddChild(startDateDatePicker);
     buttonContainer:AddChild(endDateDatePicker);
     buttonContainer:AddChild(recalculateButton);
     buttonContainer:AddChild(getWinnersButton);
     topContainer:AddChild(buttonContainer);
+
+
+
     return topContainer;
 end
 function ZLM_Scoreboard:AddRow(characterName,pointTotal)

@@ -236,16 +236,16 @@ function ZLM:UpdateScoreboard(startTime,endTime)
 	end
 	sort(self.db.records.Scoreboard,ZLM_SortScoreboard);
 end -- TO DO: Needs update without params.
-function ZLM:GetRaffleWinners(winnersCount,exclusiveWinners)
+function ZLM:GetRaffleWinners()
 	local winners = {};
-	if exclusiveWinners == nil then exclusiveWinners = true; end
-	while #(winners) < winnersCount do
+	if self.db.profile.ExclusiveWinners == nil then self.db.profile.ExclusiveWinners = true; end
+	while #(winners) < ZLM.db.profile.NumberOfWinners do
 		local roll = math.random(self.db.records.TotalPoints);
 		local base = 0;
 		for i = 1,#(self.db.records.Scoreboard) do
 			local ticket = self.db.records.Scoreboard[i];
 			if roll > base and roll <= (ticket.Points + base) then
-				if (exclusiveWinners) or (not self.Contains(winners,"Name",ticket.Name)) or (self.Contains(winners,"Name",ticket.Name) and not exclusiveWinners) then
+				if (self.db.profile.ExlusiveWInners) or (not self.Contains(winners,"Name",ticket.Name)) or (self.Contains(winners,"Name",ticket.Name) and not self.db.profile.ExclusiveWinners) then
 					tinsert(winners,{ Roll = roll, Name = ticket.Name });
 					break;
 				end
@@ -253,22 +253,22 @@ function ZLM:GetRaffleWinners(winnersCount,exclusiveWinners)
 		end
 	end
 	return winners;
-end -- TO DO: Needs update without params.
-function ZLM:GetCompetitionWinners(winnersCount)
+end
+function ZLM:GetCompetitionWinners()
 	local winners = {};
-	for i = 1,winnersCount do
-		tinsert(winners,self.db.records.Scoreboard[i]);
+	for i = 1,ZLM.db.profile.NumberOfWinners do
+		tinsert(winners,self.db.global.Scoreboard[i]);
 	end
 	return winners;
-end -- TO DO: Needs update without params.
-function ZLM:AnnounceWinners(startTime,endTime,winners,lotteryMethod)
-	local firstMessage ="The Lottery Winners for -"..startTime.."- through -"..endTime.."- are:";	
+end
+function ZLM:AnnounceWinners(winners)
+	local firstMessage ="The Lottery Winners for -"..date("%m/%d/%y %H:%M:%S",ZLM.db.profile.ScoreboardStartDateTime).."- through -"..date("%m/%d/%y %H:%M:%S",ZLM.db.profile.ScoreboardEndDateTime).."- are:";
 	if ZLM_Debug then	
 		print(firstMessage);
 	else
 		SendChatMessage(firstMessage,ZLM_Options.OutputChatType,nil,ZLM_Options.OutputChatChannel);
 	end	
-	if lotteryMethod == ZLM_LotteryManager.LotteryMethod.Competition then
+	if ZLM.db.profile.LotteryMethod == ZLM_LotteryManager.LotteryMethod.Competition then
 		local results = ZLM_GetTieResults;
 		for k,v in pairs(results) do
 			local message = k..": "..table.concat(v,", ");
@@ -278,23 +278,16 @@ function ZLM:AnnounceWinners(startTime,endTime,winners,lotteryMethod)
 				SendChatMessage(message,ZLM_Options.OutputChatType,nil,ZLM_Options.OutputChatChannel);
 			end
 		end
-	elseif lotteryMethod == ZLM_LotteryManager.LotteryMethod.Raffle then
+	elseif ZLM.db.profile.LotteryMethod == ZLM_LotteryManager.LotteryMethod.Raffle then
 		for i,v in ipairs(winners) do
 			local message = i..": "..v.Name .. " (Roll: " .. v.Roll .. ")";
 			if ZLM_Debug then
 				print(message);
 			else
-				SendChatMessage(message,ZLM_Options.OutputChatType,nil,ZLM_Options.OutputChatChannel);
+				SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
 			end
 		end
 	end
-end -- TO DO: Needs update without params.
-function ZLM:ConverteStringToTime(str)
-	local day,month,year,hour,min,sec=str:match(ZLM_DateStringPattern);
-	local MON={Jan=1,Feb=2,Mar=3,Apr=4,May=5,Jun=6,Jul=7,Aug=8,Sep=9,Oct=10,Nov=11,Dec=12};
-	local month=MON[month];
-	local offset=time()-time(date("!*t"));
-	return time({day=day,month=month,year=year,hour=hour,min=min,sec=sec}) + offset;
 end
 function ZLM:Contains(table,property,value)
 	for z = 1,#(table) do
@@ -331,7 +324,7 @@ function ZLM:ShowScoreboard()
             ZLM:Debug("Updating DateTime for " .. controlKey .. "DatePicker." .. segmentKey .. " to " .. value .. ".",1)
             ZLM.db.profile[controlKey .. "DatePicker"][segmentKey] = value;
             ZLM.db.profile[controlKey] = time(ZLM.db.profile[controlKey .. "DatePicker"]);
-        end)
+        end, ZLM.db.profile.ScoreboardStartDateTimeDatePicker, ZLM.db.profile.ScoreboardEndDateTimeDatePicker)
 end
 ZLM_LotteryItem = {};
 function ZLM_LotteryItem:new()
@@ -345,9 +338,9 @@ function ZLM_LotteryItem:new()
     return entry;
 end
 
-function ZLM:GetDonationsWithinTimeframe(startTimeString,endTimeString)
-    local time1 = ConvertStringToTime(startTimeString);
-    local time2 = ConvretStringToTime(endTimeString);
+function ZLM:GetDonationsWithinTimeframe()
+    local time1 = self.db.profile.ScoreboardStartDateTime;
+    local time2 = self.db.profile.ScoreboardEndDateTime;
     local output = {};
     for i = 1,#(self.db.records.Donations),1 do
         local logItem = self.db.records.Donations[i];
