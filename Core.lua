@@ -2,37 +2,67 @@ ZLM_LotteryMethod = {
     Competition = "Competition",
     Raffle = "Raffle"
 };
-local defaults = {
+ZLM_OptionDefaults = {
     profile = {
         Enabled = true,
         PrintLevel = 0,
         LotteryItems = {},
         LotteryMethod = ZLM_LotteryMethod.Raffle,
         NumberOfWinners = 1,
-        ExclusiveWinners = true
+        ExclusiveWinners = true,
+        ScoreboardStartDateTimeDatePicker = {
+            year = 2018,
+            month = 1,
+            day = 1,
+            hour = 0,
+            minute = 0,
+            sec = 0
+        },
+        ScoreboardStartDateTime = 0,
+        ScoreboardEndDateTime = 0,
+        ScoreboardEndDateTimeDatePicker = {
+            year = 2018,
+            month = 1,
+            day = 1,
+            hour = 0,
+            minute = 0,
+            sec = 0
+        }
     },
-    records = {
+    --[[records = {
         Donations = {},
         Scoreboard = {},
         ScoreboardTotal = 0,
         TotalPoints = 0,
         RollLimit = 0
-    }
-}
+    }]]
+};
+function ZLM_SortScoreboard(a,b)
+    if a == b then
+        return a.Name < b.Name --Sort names alphabetically if scores are equal
+    else
+        return a.Points > b.Points; --Sort scores from largest to smallest.
+    end
+end
+
+ZLM = LibStub("AceAddon-3.0"):NewAddon("ZatenkeinsLotteryManager", "AceConsole-3.0", "AceEvent-3.0");
 ZLM_OptionsTable = {
     type = "group",
-    chidlGroups = "tab",
+    handler = ZLM,
     args = {
         config = {
             name = "Config",
             type="group",
+            order = 0,
             args = {
                 enable = {
                     name = "Enable",
                     desc = "Enables/disables the addon",
                     type = "toggle",
                     set = "SetEnabled",
-                    get = "GetEnabled"
+                    get = "GetEnabled",
+                    order = 1,
+                    descStyle="inline"
                 },
                 debug = {
                     name = "Debug Print Level",
@@ -43,7 +73,9 @@ ZLM_OptionsTable = {
                     step = 1,
                     bigStep = 1,
                     set = "SetPrintLevel",
-                    get = "GetPrintLevel"
+                    get = "GetPrintLevel",
+                    order = 2,
+                    descStyle= "inline"
                 },
                 lotteryMethod = {
                     name = "Lottery Method",
@@ -51,7 +83,9 @@ ZLM_OptionsTable = {
                     type = "select",
                     set = "SetLotteryMethod",
                     get = "GetLotteryMethod",
-                    values = ZLM_LotteryMethod
+                    values = ZLM_LotteryMethod,
+                    order = 3,
+                    descStyle="inline"
                 },
                 numberOfWinners = {
                     name = "Number of Winners",
@@ -62,79 +96,80 @@ ZLM_OptionsTable = {
                     step = 1,
                     bigStep = 1,
                     set = "SetWinnerCount",
-                    get = "GetWinnerCount"
+                    get = "GetWinnerCount",
+                    order = 4,
+                    descStyle="inline"
                 },
                 exclusiveWinners = {
                     name = "Exclusive Winners",
                     desc = "[Raffle Method Only]Can the same person win more than once per drawing?",
                     type = "toggle",
                     set = "SetExclusiveWinners",
-                    get = "GetExclusiveWinners"
+                    get = "GetExclusiveWinners",
+                    order = 5,
+                    descStyle="inline"
+                },
+            },
+        },
+        bounties = {
+            name = "Bounties",
+            type = "group",
+            args = {
+
+            }
+        },
+        scoreboard = {
+            name = "Scoreboard",
+            type = "execute",
+            func = function()
+                ZLM:ShowScoreboard();
+                ZLM:Debug("Showing Scoreboard");
+            end,
+            order = 0
+        },
+        donations = {
+            name = "Donations",
+            type = "group",
+            args = {
+                addDonation = {
+                    name="Add Donation",
+                    type="execute",
+                    func = function()
+                        ZLM:Debug("Adding Donation!");
+                    end
                 },
             }
         },
-        LotteryItems = {
-            name = "Lottery Items",
-            type = "group",
-            args = {
-                addNew = {
-                    name = "Add New",
-                    desc = "Add a new lottery item.",
-                    type = "execute",
-                    func = ZLM_Options:addNewLotteryItem();
-                },
-                sort = {
-                    name="Sort",
-                    desc = "Sorts the lottery items by ItemID",
-                    type="execute",
-                    func = ZLM_Options:sortLotteryItems();
-                },
-                list = {
-                    name = "List",
-                    desc = "List of lottery items.",
-                    type = "group",
-                    childGroups = "inline",
-                    args = {
 
-                    }
-                }
-            }
-        }
     }
-}
-
-function ZLM_SortScoreboard(a,b)
-    if a == b then
-        return a.Name < b.Name --Sort names alphabetically if scores are equal
-    else
-        return a.Points > b.Points; --Sort scores from largest to smallest.
-    end
-end
-
-ZLM = LibStub("AceAddon-3.0"):NewAddon("ZatenkeinsLotteryManager", "AceConsole-3.0", "AceEvent-3.0");
-
-function ZLM:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New("ZatenkeinsLotteryManagerDB", defaults, true)
-
-    LibStub("AceConfig-3.0"):RegisterOptionsTable("ZatenkeinsLotteryManager", ZLM_OptionsTable, {"zlm"})
-    self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("ZatenkeinsLotteryManager", "ZLM")
-    self:Print("ZLM Loaded");
-end
-
+};
 function ZLM:Debug(message,severity)
-    if self.db.profile.PrintLevel > severity then
-        self.Print(message);
+    --if self.db.profile.PrintLevel < severity then
+        self:Print(message);
+    --end
+end
+
+ZLM:Debug("ZLM instantiated.",1);
+function ZLM:OnInitialize()
+    self.db = LibStub("AceDB-3.0"):New("ZatenkeinsLotteryManagerDB", ZLM_OptionDefaults, true);
+    if not not self.db then
+        self:Debug("DB Created.",1);
+    else
+        self:Debug("DB Failed!",4);
     end
+    LibStub("AceConfig-3.0"):RegisterOptionsTable("ZatenkeinsLotteryManager", ZLM_OptionsTable, {"zlm"});
+    self:Debug("Options Table Registered..",1);
+    self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("ZatenkeinsLotteryManager", "ZLM");
+    self:Debug("OptionsFrame added to BlizOptions.",1);
+    self:Print("ZLM Loaded");
 end
 
 function ZLM:OnEnable()
     --Register events here.
 end
-
 function ZLM:OnDisable()
     --Unregister events here.
 end
-
 function ZLM:SetEnabled(_,value)
     self.db.profile.Enabled = value;
     ZLM:Debug("Setter Event - Property: Enabled, Value: " .. string.format("%s",value),1);
@@ -170,8 +205,7 @@ end
 function ZLM:GetExclusiveWinners(_)
     return self.db.profile.ExclusiveWinners;
 end
-
-function ZLM:RunLottery(startTime,endTime)
+function ZLM:RunLottery(startTime,endTime) -- TO DO: Needs update without params.
 	ZLM_LotteryManager:UpdateScoreboard(startTime,endTime);	
 	local lotteryMethod = self.db.profile.LotteryMethod;
 	local lotteryWinnerCount = self.db.profile.NumberOfWinners;
@@ -179,11 +213,10 @@ function ZLM:RunLottery(startTime,endTime)
 	if lotteryMethod == ZLM_LotteryMethod.Competition then
 		winners = self:GetCompetitionWinners(lotteryWinnerCount)
 	elseif lotteryMethod == ZLM_LotteryMethod.Raffle then
-		winners = self:GetRollWinners(lotteryWinnerCount);
+		winners = self:GetRaffleWinners(lotteryWinnerCount);
 	end
 	ZLM:AnnounceWinners(startTime,endTime,winners,lotteryMethod);
 end
-
 function ZLM:UpdateScoreboard(startTime,endTime)
 	local donations = ZLM:GetDonationsWithinTimeframe(startTime,endTime);
 	local scoreboard = {};
@@ -202,8 +235,8 @@ function ZLM:UpdateScoreboard(startTime,endTime)
 		tinsert(self.db.records.Scoreboard,v);
 	end
 	sort(self.db.records.Scoreboard,ZLM_SortScoreboard);
-end
-function ZLM:GetRollWinners(winnersCount,exclusiveWinners)
+end -- TO DO: Needs update without params.
+function ZLM:GetRaffleWinners(winnersCount,exclusiveWinners)
 	local winners = {};
 	if exclusiveWinners == nil then exclusiveWinners = true; end
 	while #(winners) < winnersCount do
@@ -220,14 +253,14 @@ function ZLM:GetRollWinners(winnersCount,exclusiveWinners)
 		end
 	end
 	return winners;
-end
+end -- TO DO: Needs update without params.
 function ZLM:GetCompetitionWinners(winnersCount)
 	local winners = {};
 	for i = 1,winnersCount do
 		tinsert(winners,self.db.records.Scoreboard[i]);
 	end
 	return winners;
-end
+end -- TO DO: Needs update without params.
 function ZLM:AnnounceWinners(startTime,endTime,winners,lotteryMethod)
 	local firstMessage ="The Lottery Winners for -"..startTime.."- through -"..endTime.."- are:";	
 	if ZLM_Debug then	
@@ -245,7 +278,7 @@ function ZLM:AnnounceWinners(startTime,endTime,winners,lotteryMethod)
 				SendChatMessage(message,ZLM_Options.OutputChatType,nil,ZLM_Options.OutputChatChannel);
 			end
 		end
-	elseif lotteryMethod == ZLM_LotteryManager.LotteryMethod.Roll then
+	elseif lotteryMethod == ZLM_LotteryManager.LotteryMethod.Raffle then
 		for i,v in ipairs(winners) do
 			local message = i..": "..v.Name .. " (Roll: " .. v.Roll .. ")";
 			if ZLM_Debug then
@@ -255,8 +288,7 @@ function ZLM:AnnounceWinners(startTime,endTime,winners,lotteryMethod)
 			end
 		end
 	end
-end
-
+end -- TO DO: Needs update without params.
 function ZLM:ConverteStringToTime(str)
 	local day,month,year,hour,min,sec=str:match(ZLM_DateStringPattern);
 	local MON={Jan=1,Feb=2,Mar=3,Apr=4,May=5,Jun=6,Jul=7,Aug=8,Sep=9,Oct=10,Nov=11,Dec=12};
@@ -264,15 +296,13 @@ function ZLM:ConverteStringToTime(str)
 	local offset=time()-time(date("!*t"));
 	return time({day=day,month=month,year=year,hour=hour,min=min,sec=sec}) + offset;
 end
-
 function ZLM:Contains(table,property,value)
 	for z = 1,#(table) do
 		if table[z][property] == value then return true; end
 	end
 	return false;
 end
-
-function ZLM:GetTieResults(winners)
+function ZLM:GetTieResults(winners) --INCOMPLETE
 	local pendingResults = {};
 	for _,v in ipairs(winners) do
         local record = pendingResults[v.Points];
@@ -282,9 +312,27 @@ function ZLM:GetTieResults(winners)
             pendingResults[v.Points] = record .. ", " .. v.Name
         end
     end
+    sort(pendingResults,function(a,b)
+
+    end)
     return pendingResults;
 end
-
+function ZLM:ShowScoreboard()
+    ZLM:Debug("Showing Scoreboard.", 1);
+    ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard",
+        function()
+            ZLM:UpdateScoreboard();
+        end,
+        function()
+            ZLM:UpdateScoreboard();
+            ZLM:RunLottery();
+        end,
+        function(controlKey,segmentKey,value)
+            ZLM:Debug("Updating DateTime for " .. controlKey .. "DatePicker." .. segmentKey .. " to " .. value .. ".",1)
+            ZLM.db.profile[controlKey .. "DatePicker"][segmentKey] = value;
+            ZLM.db.profile[controlKey] = time(ZLM.db.profile[controlKey .. "DatePicker"]);
+        end)
+end
 ZLM_LotteryItem = {};
 function ZLM_LotteryItem:new()
     local entry = {};
@@ -309,11 +357,9 @@ function ZLM:GetDonationsWithinTimeframe(startTimeString,endTimeString)
     end
     return output;
 end
-
 function ZLM:RecordDonation(nameRealmCombo,itemId,quantity) -- Add a new record to the donation log.
 
 end
-
 function ZLM:PurgeDonationLog(timeString) -- Purge all DonationLog records before a specific time.
     local purgeTime;
     if not not timeString then
@@ -335,7 +381,6 @@ ZLM_Donation = {
     Quantity = 0,
     Timestamp = 0,
 }
-
 function ZLM_Donation:new(nameRealmCombo,itemId,quantity)
     local donation = {};
     donation.Name = nameRealmCombo;

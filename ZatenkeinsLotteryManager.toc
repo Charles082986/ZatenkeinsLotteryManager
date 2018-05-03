@@ -8,3 +8,6 @@
 embeds.xml
 
 Core.lua
+ZLM_Text.lua
+ZLM_DatePicker.lua
+ZLM_Scoreboard.lua
