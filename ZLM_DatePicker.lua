@@ -4,10 +4,10 @@ function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueC
     --BEGIN: Create Parent Frame
     local frame = AceGUI:Create("SimpleGroup");
     local dateFrame = AceGUI:Create("SimpleGroup");
-    dateFrame:SetRelativeWidth(1);
+    dateFrame:SetRelativeWidth(0.5);
     dateFrame:SetLayout("Flow");
     frame:SetLayout("Flow");
-    frame:SetRelativeWidth(0.5);
+    frame:SetFullWidth(1);
     --END: Create Parent Frame
     --BEGIN: Create Dropdowns
     local years = {};
@@ -29,24 +29,67 @@ function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueC
         days[i] = i;
         tinsert(daysOrder,i);
     end
-    local baseSize = 0.23;
-    local yearsDropdown = ZLM_DatePicker:CreateDropDown(years,yearsOrder,baseSize,controlKey,"year",onValueChangedCallback,defaultValue.year);
-    local monthsDropdown = ZLM_DatePicker:CreateDropDown(months,monthsOrder,baseSize,controlKey,"month",onValueChangedCallback,defaultValue.month);
-    local daysDropdown = ZLM_DatePicker:CreateDropDown(days,daysOrder,baseSize,controlKey,"day",onValueChangedCallback,defaultValue.day);
+    local baseSize = 1/3;
+    local yearsDropdown = ZLM_DatePicker:CreateDropDown(years,yearsOrder,baseSize * 1.1,controlKey,"year",onValueChangedCallback,defaultValue.year,AceGUI);
+    local monthsDropdown = ZLM_DatePicker:CreateDropDown(months,monthsOrder,baseSize * 1.1,controlKey,"month",onValueChangedCallback,defaultValue.month,AceGUI);
+    local daysDropdown = ZLM_DatePicker:CreateDropDown(days,daysOrder,baseSize * 0.8,controlKey,"day",onValueChangedCallback,defaultValue.day,AceGUI);
     --END: CREATE DROPDOWNS
     --BEGIN: ADD DROPDOWNS TO PARENT
-    frame:AddChild(ZLM_Heading:new(name,AceGUI));
-    dateFrame:AddChild(ZLM_Label:new(" Yr:",0.1,AceGUI));
-    dateFrame:AddChild(yearsDropdown);
-    dateFrame:AddChild(ZLM_Label:new(" Mth:",0.1,AceGUI));
+    if not not name then
+        frame:AddChild(ZLM_Heading:new(name,AceGUI));
+    end
+    --dateFrame:AddChild(ZLM_Label:new(" Mth:",0.1,AceGUI));
     dateFrame:AddChild(monthsDropdown);
-    dateFrame:AddChild(ZLM_Label:new(" Day:",0.1,AceGUI));
+    --dateFrame:AddChild(ZLM_Label:new(" Day:",0.1,AceGUI));
     dateFrame:AddChild(daysDropdown);
+    --dateFrame:AddChild(ZLM_Label:new(" Yr:",0.1,AceGUI));
+    dateFrame:AddChild(yearsDropdown);
     --END: ADD DROPDOWNS TO PARENT
     frame:AddChild(dateFrame);
+    frame.picker = {};
+    frame.picker.year = yearsDropdown;
+    frame.picker.month = monthsDropdown;
+    frame.picker.day = daysDropdown;
+    function frame:SetDate(dateObj)
+        for k,v in pairs(dateObj) do
+            local p = self.picker[k];
+            if not not p then
+                p:SetValue(v);
+                onValueChangedCallback(controlKey,k,v);
+            end
+        end
+    end
+    function frame:SetDateCurrent()
+        self:SetDate(date("*t"));
+    end
+    function frame:SetDatePast(dateObj)
+        local multipliers = {
+            sec = 1,
+            minute = 60,
+            hour = 3600,
+            day = 86400
+        }
+        local d = date("*t");
+        local t = time(d);
+        for k,v in pairs(dateObj) do
+            local m = multipliers[k];
+            if not not m then
+                t = t - (m * v);
+            end
+        end
+        d = date("*t",t);
+        if dateObj.DayState ~= nil then
+            if dateObj.DayState == 0 then
+                d.sec = 0; d.minute = 0; d.hour = 0;
+            else
+                d.sec = 59; d.minute = 59; d.hour = 23;
+            end
+        end
+        self:SetDate(d);
+    end
     if not not includeTime then
         local timeFrame = AceGUI:Create("SimpleGroup");
-        timeFrame:SetRelativeWidth(1);
+        timeFrame:SetRelativeWidth(0.5);
         timeFrame:SetLayout("Flow");
         --BEGIN: CREATE TIME DROPDOWNS
         local hours = {};
@@ -58,7 +101,11 @@ function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueC
                 hours[i] = i;
                 tinsert(hoursOrder,i);
             end
-            sixty[i] = i;
+            if i < 10 then
+                sixty[i] = ":0"..i;
+            else
+                sixty[i] = ":"..i;
+            end
             tinsert(sixtyOrder,i);
         end
         local hoursDropdown = ZLM_DatePicker:CreateDropDown(hours,hoursOrder,baseSize,controlKey,"hour",onValueChangedCallback, defaultValue.hour);
@@ -66,14 +113,17 @@ function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueC
         local secondsDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"sec",onValueChangedCallback, defaultValue.sec);
         --END: CREATE TIME DROPDOWNS
         --BEGIN: ADD TIME DROPDOWNS TO PARENT
-        timeFrame:AddChild(ZLM_Label:new(" Hr:",0.1,AceGUI));
+        --timeFrame:AddChild(ZLM_Label:new(" Hr:",0.1,AceGUI));
         timeFrame:AddChild(hoursDropdown);
-        timeFrame:AddChild(ZLM_Label:new(" Min:",0.1,AceGUI));
+        --timeFrame:AddChild(ZLM_Label:new(" Min:",0.1,AceGUI));
         timeFrame:AddChild(minutesDropdown);
-        timeFrame:AddChild(ZLM_Label:new(" Sec:",0.1,AceGUI));
+        --timeFrame:AddChild(ZLM_Label:new(" Sec:",0.1,AceGUI));
         timeFrame:AddChild(secondsDropdown);
         --END: ADD TIME DROPDOWNS TO PARENT
         frame:AddChild(timeFrame);
+        frame.picker.hour = hoursDropdown;
+        frame.picker.minute = minutesDropdown;
+        frame.picker.sec = secondsDropdown;
     end
     return frame;
 end

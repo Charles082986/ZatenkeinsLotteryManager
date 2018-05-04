@@ -7,9 +7,11 @@
 
 embeds.xml
 
-Core.lua
 
-ZLM_Text.lua
-ZLM_DatePicker.lua
+
+Core.lua
 ZLM_Scoreboard.lua
+ZLM_Controls.lua
+ZLM_DatePicker.lua
 ZLM_Table.lua
+

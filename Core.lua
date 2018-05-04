@@ -312,19 +312,22 @@ function ZLM:GetTieResults(winners) --INCOMPLETE
 end
 function ZLM:ShowScoreboard()
     ZLM:Debug("Showing Scoreboard.", 1);
-    ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard",
-        function()
-            ZLM:UpdateScoreboard();
-        end,
-        function()
+    ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
+        ,{ GetWinners = function()
             ZLM:UpdateScoreboard();
             ZLM:RunLottery();
         end,
-        function(controlKey,segmentKey,value)
+        UpdateScoreboard = function()
+            ZLM:UpdateScoreboard();
+        end,
+        DateChanged = function(controlKey,segmentKey,value)
             ZLM:Debug("Updating DateTime for " .. controlKey .. "DatePicker." .. segmentKey .. " to " .. value .. ".",1)
             ZLM.db.profile[controlKey .. "DatePicker"][segmentKey] = value;
             ZLM.db.profile[controlKey] = time(ZLM.db.profile[controlKey .. "DatePicker"]);
-        end, ZLM.db.profile.ScoreboardStartDateTimeDatePicker, ZLM.db.profile.ScoreboardEndDateTimeDatePicker)
+        end,
+        AnnounceScoreboard = function() print("beep boop"); end,
+        AnnounceQuantityChanged = function() print("doobadee"); end},
+        { StartDate = ZLM.db.profile.ScoreboardStartDateTimeDatePicker, EndDate = ZLM.db.profile.ScoreboardEndDateTimeDatePicker, AnnounceQuantity = 5 });
 end
 ZLM_LotteryItem = {};
 function ZLM_LotteryItem:new()

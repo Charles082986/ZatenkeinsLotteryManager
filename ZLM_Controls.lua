@@ -16,6 +16,7 @@ function ZLM_Heading:new(text,AceGUI)
     heading:SetFullWidth(true);
     return heading;
 end
+ZLM_InteractiveLabel = {};
 function ZLM_InteractiveLabel:new(text,width,onClick,onEnter,onLeave,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     local label = AceGUI:Create("InteractiveLabel");
@@ -31,4 +32,28 @@ function ZLM_InteractiveLabel:new(text,width,onClick,onEnter,onLeave,AceGUI)
         label:SetCallback("OnLeave",onLeave);
     end
     return label;
+end
+ZLM_Button = {};
+function ZLM_Button:new(text,func,width,AceGUI)
+    if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+    if not width then width = 1; end
+    local button = AceGUI:Create("Button");
+    button:SetText(text);
+    button:SetCallback("OnClick",func);
+    button:SetRelativeWidth(width);
+    return button;
+end
+ZLM_Range = {};
+function ZLM_Range:new(label,min,max,step,width,callback,AceGUI,defaultValue)
+    if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+    if not not defaultValue then defaultValue = math.floor(((min + max) / 2) / step) * step; end
+    local range = AceGUI:Create("Slider");
+    if not not label then
+        range:SetLabel(label);
+    end
+    range:SetSliderValues(min,max,step);
+    range:SetValue(defaultValue);
+    range:SetCallback("OnValueChanged",callback);
+    range:SetRelativeWidth(width);
+    return range;
 end
