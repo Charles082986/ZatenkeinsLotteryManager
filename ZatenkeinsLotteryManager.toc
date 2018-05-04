@@ -3,7 +3,7 @@
 ## Notes: Manages an Item-Based Guild Lottery
 ## Author: Zatenkein
 ## Version: 1.0
-## SavedVariables: ZatenkeinsLotteryManagerDB
+## SavedVariables: ZatenkeinsLotteryManagerDB, ZLM_ScoreboardData
 
 embeds.xml
 

@@ -1,3 +1,4 @@
+ZLM_Controls = {};
 ZLM_Label = {};
 function ZLM_Label:new(text,width,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
@@ -6,6 +7,7 @@ function ZLM_Label:new(text,width,AceGUI)
     label:SetRelativeWidth(width);
     return label;
 end
+ZLM_Controls["Label"] = ZLM_Label;
 
 ZLM_Heading = {};
 function ZLM_Heading:new(text,AceGUI)
@@ -16,6 +18,8 @@ function ZLM_Heading:new(text,AceGUI)
     heading:SetFullWidth(true);
     return heading;
 end
+ZLM_Controls["Heading"] = ZLM_Heading;
+
 ZLM_InteractiveLabel = {};
 function ZLM_InteractiveLabel:new(text,width,onClick,onEnter,onLeave,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
@@ -33,6 +37,8 @@ function ZLM_InteractiveLabel:new(text,width,onClick,onEnter,onLeave,AceGUI)
     end
     return label;
 end
+ZLM_Controls["InteractiveLabel"] = ZLM_InteractiveLabel;
+
 ZLM_Button = {};
 function ZLM_Button:new(text,func,width,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
@@ -43,6 +49,8 @@ function ZLM_Button:new(text,func,width,AceGUI)
     button:SetRelativeWidth(width);
     return button;
 end
+ZLM_Controls["Button"] = ZLM_Button;
+
 ZLM_Range = {};
 function ZLM_Range:new(label,min,max,step,width,callback,AceGUI,defaultValue)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
@@ -57,3 +65,4 @@ function ZLM_Range:new(label,min,max,step,width,callback,AceGUI,defaultValue)
     range:SetRelativeWidth(width);
     return range;
 end
+ZLM_Controls["Range"] = ZLM_Range;

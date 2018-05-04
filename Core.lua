@@ -27,18 +27,29 @@ ZLM_OptionDefaults = {
             hour = 0,
             minute = 0,
             sec = 0
-        }
+        },
+        GuildRanksElligible = {
+            false,
+            false,
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        },
+        OutputChatType = "GUILD",
+        OutputChannel = "",
     },
-    --[[records = {
+    global = {
         Donations = {},
-        Scoreboard = {},
-        ScoreboardTotal = 0,
-        TotalPoints = 0,
-        RollLimit = 0
-    }]]
+        Prizes = {},
+    }
 };
 function ZLM_SortScoreboard(a,b)
-    if a == b then
+    if a.Points == b.Points then
         return a.Name < b.Name --Sort names alphabetically if scores are equal
     else
         return a.Points > b.Points; --Sort scores from largest to smallest.
@@ -109,14 +120,22 @@ ZLM_OptionsTable = {
                     order = 5,
                     descStyle="inline"
                 },
+                outputChatType = {
+                    name = "Output Chat",
+                    desc = "The chat type to use for lottery announcements. (GUILD, WHISPER, etc)",
+                    type = "select",
+                    values = { GUILD = "GUILD",  SAY = "SAY", WHISPER = "WHISPER" },
+                    get = "GetOutputChatType", -- NYI
+                    set = "SetOutputChatType" -- NYI
+                },
+                outputChatChannel = {
+                    name = "Output Channel",
+                    desc = "The channel or whisper target you wish to send lottery announcements too.",
+                    type = "input",
+                    get = "GetOutputChannel", -- NYI
+                    set = "SetOutputChannel" -- NYI
+                }
             },
-        },
-        bounties = {
-            name = "Bounties",
-            type = "group",
-            args = {
-
-            }
         },
         scoreboard = {
             name = "Scoreboard",
@@ -127,20 +146,6 @@ ZLM_OptionsTable = {
             end,
             order = 0
         },
-        donations = {
-            name = "Donations",
-            type = "group",
-            args = {
-                addDonation = {
-                    name="Add Donation",
-                    type="execute",
-                    func = function()
-                        ZLM:Debug("Adding Donation!");
-                    end
-                },
-            }
-        },
-
     }
 };
 function ZLM:Debug(message,severity)
@@ -163,7 +168,6 @@ function ZLM:OnInitialize()
     self:Debug("OptionsFrame added to BlizOptions.",1);
     self:Print("ZLM Loaded");
 end
-
 function ZLM:OnEnable()
     --Register events here.
 end
@@ -205,8 +209,8 @@ end
 function ZLM:GetExclusiveWinners(_)
     return self.db.profile.ExclusiveWinners;
 end
-function ZLM:RunLottery(startTime,endTime) -- TO DO: Needs update without params.
-	ZLM_LotteryManager:UpdateScoreboard(startTime,endTime);	
+function ZLM:RunLottery() -- TO DO: Needs update without params.
+	ZLM:UpdateScoreboard();
 	local lotteryMethod = self.db.profile.LotteryMethod;
 	local lotteryWinnerCount = self.db.profile.NumberOfWinners;
 	local winners = {};
@@ -215,27 +219,32 @@ function ZLM:RunLottery(startTime,endTime) -- TO DO: Needs update without params
 	elseif lotteryMethod == ZLM_LotteryMethod.Raffle then
 		winners = self:GetRaffleWinners(lotteryWinnerCount);
 	end
-	ZLM:AnnounceWinners(startTime,endTime,winners,lotteryMethod);
+	ZLM:AnnounceWinners(winners,lotteryMethod);
 end
-function ZLM:UpdateScoreboard(startTime,endTime)
-	local donations = ZLM:GetDonationsWithinTimeframe(startTime,endTime);
-	local scoreboard = {};
-	for i = 1,#(donations),1 do
-		local donation = donations[i];
-		if scoreboard[donation.Name] ~= nil then
-			scoreboard[donation.Name].Points = scoreboard[donation.Name].Points + donation.TotalPoints;
-		else
-			scoreboard[donation.Name] = { Name = donation.Name, Points = donation.TotalPoints };
-		end
-	end
-	self.db.records.Scoreboard = {};
-	self.db.records.ScoreboardTotal = 0;
-	for _,v in pairs(scoreboard) do
-		self.db.records.TotalPoints = self.db.records.TotalPoints + v.Points;
-		tinsert(self.db.records.Scoreboard,v);
-	end
-	sort(self.db.records.Scoreboard,ZLM_SortScoreboard);
-end -- TO DO: Needs update without params.
+function ZLM:UpdateScoreboard()
+	local donations = GetDonationsWithinTimeFrame();
+    local pointsTable = {} -- TO DO: Get assoiative array of ItemID and Points.
+    ZLM_ScoreboardData = {};
+    local tempPoints = {};
+    for _,v in ipairs(donations) do
+        local points = pointsTalbe[v.ItemId] * v.Quantity;
+        if not not tempPoints[v.Name] then tempPoints[v.Name] = tempPoints[v.Name] + points; else tempPoints[v.Name] = points; end
+    end
+    for k,v in pairs(tempPoints) do
+        tinsert(ZLM_ScoreboardData,{ Name = k, Points = v });
+    end
+    sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
+    local rangeMin = 1;
+    for i,v in ipairs(ZLM_ScoreboardData) do
+        v.Rank = i;
+        v.Min = rangeMin;
+        v.Max = rangeMin + v.Points - 1;
+        if not not ZLM.scoreboard then
+            ZLM.scoreboard.Table.DataFrame:AddRow(v);
+        end
+        rangeMin = v.Max + 1;
+    end
+end
 function ZLM:GetRaffleWinners()
 	local winners = {};
 	if self.db.profile.ExclusiveWinners == nil then self.db.profile.ExclusiveWinners = true; end
@@ -262,30 +271,20 @@ function ZLM:GetCompetitionWinners()
 	return winners;
 end
 function ZLM:AnnounceWinners(winners)
-	local firstMessage ="The Lottery Winners for -"..date("%m/%d/%y %H:%M:%S",ZLM.db.profile.ScoreboardStartDateTime).."- through -"..date("%m/%d/%y %H:%M:%S",ZLM.db.profile.ScoreboardEndDateTime).."- are:";
-	if ZLM_Debug then	
-		print(firstMessage);
-	else
-		SendChatMessage(firstMessage,ZLM_Options.OutputChatType,nil,ZLM_Options.OutputChatChannel);
-	end	
+	local firstMessage ="The Lottery Winners for -"
+            .. date("%m/%d/%y %H:%M:%S",time(ZLM.db.profile.ScoreboardStartDateTimeDatePicker))
+            .. "- through -"..date("%m/%d/%y %H:%M:%S",time(ZLM.db.profile.ScoreboardEndDateTimeDatePicker)).."- are:";
+		SendChatMessage(firstMessage,ZLM.db.profile.OutputChatType,nil,zlm.db.profile.OutputChatChannel);
 	if ZLM.db.profile.LotteryMethod == ZLM_LotteryManager.LotteryMethod.Competition then
-		local results = ZLM_GetTieResults;
-		for k,v in pairs(results) do
-			local message = k..": "..table.concat(v,", ");
-			if ZLM_Debug then
-				print(message);
-			else
-				SendChatMessage(message,ZLM_Options.OutputChatType,nil,ZLM_Options.OutputChatChannel);
-			end
-		end
+		local results = ZLM:GetTieResults(winners);
+		for i,v in ipairs(results) do
+			local message = i..": "..v.Name;
+            SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
+        end
 	elseif ZLM.db.profile.LotteryMethod == ZLM_LotteryManager.LotteryMethod.Raffle then
 		for i,v in ipairs(winners) do
 			local message = i..": "..v.Name .. " (Roll: " .. v.Roll .. ")";
-			if ZLM_Debug then
-				print(message);
-			else
-				SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
-			end
+            SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
 		end
 	end
 end
@@ -295,8 +294,9 @@ function ZLM:Contains(table,property,value)
 	end
 	return false;
 end
-function ZLM:GetTieResults(winners) --INCOMPLETE
+function ZLM:GetTieResults(winners)
 	local pendingResults = {};
+    local sortableResults = {};
 	for _,v in ipairs(winners) do
         local record = pendingResults[v.Points];
         if not not record then
@@ -305,14 +305,17 @@ function ZLM:GetTieResults(winners) --INCOMPLETE
             pendingResults[v.Points] = record .. ", " .. v.Name
         end
     end
-    sort(pendingResults,function(a,b)
-
-    end)
-    return pendingResults;
+    for k,v in pairs(pendingResults) do
+        tinsert(sortableResults,{ Names = v, Points = k})
+    end
+    sort(sortableResults,function(a,b)
+        return a.Points > b.Points
+    end);
+    return sortableResults;
 end
 function ZLM:ShowScoreboard()
     ZLM:Debug("Showing Scoreboard.", 1);
-    ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
+    local scoreboard = ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
         ,{ GetWinners = function()
             ZLM:UpdateScoreboard();
             ZLM:RunLottery();
@@ -328,25 +331,21 @@ function ZLM:ShowScoreboard()
         AnnounceScoreboard = function() print("beep boop"); end,
         AnnounceQuantityChanged = function() print("doobadee"); end},
         { StartDate = ZLM.db.profile.ScoreboardStartDateTimeDatePicker, EndDate = ZLM.db.profile.ScoreboardEndDateTimeDatePicker, AnnounceQuantity = 5 });
-end
-ZLM_LotteryItem = {};
-function ZLM_LotteryItem:new()
-    local entry = {};
-    entry.WoWItemId = 0;
-    entry.ItemName = "";
-    entry.Active = false;
-    entry.HotItem = false;
-    entry.Multiplier = false;
-    entry.PointValue = 0;
-    return entry;
+    table.sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
+    for i,v in ipairs(ZLM_ScoreboardData) do
+        local record = v;
+        record.Rank = i;
+        scoreboard.Table.DataFrame:AddRow(record);
+    end
+    ZLM.scoreboard = scoreboard;
 end
 
 function ZLM:GetDonationsWithinTimeframe()
-    local time1 = self.db.profile.ScoreboardStartDateTime;
-    local time2 = self.db.profile.ScoreboardEndDateTime;
+    local time1 = time(self.db.profile.ScoreboardStartDateTimeDatePicker);
+    local time2 = time(self.db.profile.ScoreboardEndDateTimeDatePicker);
     local output = {};
     for i = 1,#(self.db.records.Donations),1 do
-        local logItem = self.db.records.Donations[i];
+        local logItem = self.db.global.Donations[i];
         if logItem.Timestamp >= time1 and logItem.Timestamp <= time2 then
             tinstert(output,logItem);
         end
@@ -354,19 +353,17 @@ function ZLM:GetDonationsWithinTimeframe()
     return output;
 end
 function ZLM:RecordDonation(nameRealmCombo,itemId,quantity) -- Add a new record to the donation log.
-
+    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
+    itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID,
+    isCraftingReagent = GetItemInfo(itemId);
+    tinsert(ZLM.db.global.Donations,{ Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, ItemLink = itemLink});
 end
-function ZLM:PurgeDonationLog(timeString) -- Purge all DonationLog records before a specific time.
-    local purgeTime;
-    if not not timeString then
-        purgeTime = ZLM_ConverteStringToTime(timeString);
-    else
-        purgeTime = GetServerTime();
-    end
-    for i = #(self.db.records.Donations),1,-1 do
-        local entry = self.db.records.Donations[i];
+function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a specific time.
+    local purgeTime = time(dateObj);
+    for i = #(self.db.global.Donations),1,-1 do
+        local entry = self.db.global.Donations[i];
         if entry.Timestamp < purgeTime then
-            tremove(self.db.records.Donations,i);
+            tremove(self.db.global.Donations,i);
         end
     end
 end

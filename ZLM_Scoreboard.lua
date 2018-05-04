@@ -6,6 +6,7 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
     topContainer:SetLayout("Flow");
     topContainer:SetTitle(title);
     topContainer:SetCallback("OnClose",function(widget)
+        ZLM.scoreboard = nil;
         widget:ReleaseChildren();
         AceGUI:Release(widget);
     end);
@@ -26,12 +27,17 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
     --END: Creating Datepickers
     --BEGIN: Creating Table
     topContainer.Table = ZLM_Table:new({
-        Rank = 0.1,
-        Name = 0.35,
-        Points = 0.25,
-        Min = 0.15,
-        Max = 0.15
-    },{"Rank","Name","Points","Min","Max"},AceGUI);
+        Rank = { Width = 0.1, Type = "Label" },
+        Name = { Width = 0.35, Type = "Label" },
+        Points = { Width = 0.25, Type = "Label" },
+        Min = { Width = 0.15, Type = "Label" },
+        Max = { Width = 0.15, Type = "Label" },
+    },{"Rank","Name","Points","Min","Max"}, AceGUI);
+    function topContainer:AddRow(dataObj,AceGUI)
+        if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+        --TO DO: Restructure incoming DataObj to include correct content and callbackArgs.
+        self.Table.DataFrame(dataObj,AceGUI);
+    end
     topContainer.StartDatePicker = startDateDatePicker;
     topContainer.EndDatePicker = endDateDatePicker;
     function topContainer:SetDatePickersToPreviousMonth()
@@ -84,3 +90,5 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
     topContainer:AddChild(topContainer.Table.MainFrame);
     return topContainer;
 end
+
+ZLM_ScoreboardData = {};
