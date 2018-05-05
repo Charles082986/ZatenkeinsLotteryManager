@@ -20,10 +20,17 @@ function ZLM_Bountboard:new(title,callbacks,defaultValues,AceGUI)
     },{"ItemId","Name","Need","OnHand","Points","HotItem","Delete"},AceGUI);
     function topContainer:AddRow(dataObj,AceGUI)
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+
         --TO DO: Restructure incoming DataObj to include correct content and callbackArgs.
         self.Table.DataFrame:AddRow(dataObj,AceGUI);
     end
     topContainer:AddChild(topContainer.Table.MainFrame);
-    buttonContainer = buttonContainer
+
+    local buttonContainer = AceGUI:Create("SimpleGroup");
+    buttonContainer:SetRelativeWidth(1);
+    buttonContainer:SetLayout("Flow");
+
+    buttonContainer:AddChild(ZLM_Button:new("Add New Donation",callbacks.AddNewDonation,0.25,AceGUI));
+
     return topContainer;
 end
