@@ -66,3 +66,23 @@ function ZLM_Range:new(label,min,max,step,width,callback,AceGUI,defaultValue)
     return range;
 end
 ZLM_Controls["Range"] = ZLM_Range;
+
+ZLM_Input = {};
+function ZLM_Input:new(width,callback,AceGUI,defaultValue)
+    if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+    if not not defaultValue then defaultValue = ""; end
+    local input = AceGUI:Create("Input");
+    input:SetRelativeWidth(width);
+    input:SetValue(defaultValue);
+    input:SetCallback("OnValueChanged",callback);
+end
+
+ZLM_Dropdown = {};
+function ZLM_Dropdown:new(width,values,valuesOrder,callback,AceGUI,defaultValue)
+    if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+    if not not defaultValue then defaultValue = valuesOrder[1]; end
+    local dropdown = AceGUI:Create("Dropdown");
+    dropdown:SetRelativeWidth(width);
+    dropdown:SetValue(defaultValue);
+    dropdown:SetCallback("OnValueChanged",callback);
+end

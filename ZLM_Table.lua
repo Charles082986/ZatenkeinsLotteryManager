@@ -38,14 +38,16 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
             local data = dataObj[v];
             local item = {};
             local width = structureArray[v].Width;
-            if type == "InteractiveLabel" then
+            if type == ZLM_Table.Types.InteractiveLabel then
                 item = ZLM_InteractiveLabel:new(data.Content, width, data.ClickFunc, data.EnterFunc, data.LeaveFunc, AceGUI)
-            elseif type == "Label" then
+            elseif type == ZLM_Table.Types.Label then
                 item = ZLM_Label:new(data.Content,width,AceGUI);
-            elseif type == "Button" then
+            elseif type == ZLM_Table.Types.Button then
                 item = ZLM_Button:new(data.Content, data.Func, width, AceGUI);
-            elseif type == "Input" then
-                item = ZLM_Input:new(data.Update, width, AceGUI);
+            elseif type == ZLM_Table.Types.Input then
+                item = ZLM_Input:new(width, data.Update, AceGUI, data.Content);
+            elseif type == ZLM_Table.Types.Dropdown then
+                item = ZLM_Dropdown:new()
             end
             self.RowContainer:AddChild(item)
         end
@@ -57,3 +59,5 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
     tableContainer:AddChild(tableDataContainer);
     return { MainFrame = tableContainer, DataFrame = scrollContainer };
 end
+
+ZLM_Table.Types = { Label = "Label", InteractiveLabel = "InteractiveLabel", Button = "Button", Input = "Input", Dropdown = "Dropdown" };
