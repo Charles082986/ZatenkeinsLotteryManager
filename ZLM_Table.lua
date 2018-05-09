@@ -33,6 +33,9 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
         local structureArray = self.StructureArray;
         local orderArray = self.OrderArray;
+        local rowGroup = AceGUI:Create("SimpleGroup");
+        rowGroup:SetFullWidth(true);
+        rowGroup:SetLayout("Flow");
         for _,v in ipairs(orderArray) do
             local type = structureArray[v].Type;
             local data = dataObj[v];
@@ -49,8 +52,11 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
             elseif type == ZLM_Table.Types.Dropdown then
                 item = ZLM_Dropdown:new()
             end
-            self.RowContainer:AddChild(item)
+            rowGroup[v] = item;
+            rowGroup:AddChild(item);
+            --self.RowContainer:AddChild(item)
         end
+        self.RowContainer:AddChild(rowGroup);
         self:DoLayout();
     end
     scrollContainer.RowContainer = rowContainer;
@@ -60,4 +66,4 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
     return { MainFrame = tableContainer, DataFrame = scrollContainer };
 end
 
-ZLM_Table.Types = { Label = "Label", InteractiveLabel = "InteractiveLabel", Button = "Button", Input = "Input", Dropdown = "Dropdown" };
+ZLM_Table.Types = { Label = "Label", InteractiveLabel = "InteractiveLabel", Button = "Button", Input = "EditBox", Dropdown = "Dropdown", Toggle = "CheckBox" };

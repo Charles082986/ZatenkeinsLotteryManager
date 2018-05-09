@@ -71,10 +71,10 @@ ZLM_Input = {};
 function ZLM_Input:new(width,callback,AceGUI,defaultValue)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     if not not defaultValue then defaultValue = ""; end
-    local input = AceGUI:Create("Input");
+    local input = AceGUI:Create("EditBox");
     input:SetRelativeWidth(width);
-    input:SetValue(defaultValue);
-    input:SetCallback("OnValueChanged",callback);
+    input:SetText(defaultValue);
+    input:SetCallback("OnEnterPressed",callback);
 end
 
 ZLM_Dropdown = {};
@@ -82,7 +82,19 @@ function ZLM_Dropdown:new(width,values,valuesOrder,callback,AceGUI,defaultValue)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     if not not defaultValue then defaultValue = valuesOrder[1]; end
     local dropdown = AceGUI:Create("Dropdown");
+    dropdown:SetList(values,valuesOrder);
     dropdown:SetRelativeWidth(width);
     dropdown:SetValue(defaultValue);
     dropdown:SetCallback("OnValueChanged",callback);
+end
+
+ZLM_Checkbox = {};
+function ZLM_Checkbox:new(width,callback,AceGUI,defaultValue)
+    if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+    if not not defaultValue then defaultValue = false; end
+    local toggle = AceGUI:Create("Checkbox");
+    toggle:SetRelativeWidth(width);
+    toggle:SetValue(defaultValue);
+    toggle:SetCallback("OnValueChanged",callback);
+    return toggle;
 end

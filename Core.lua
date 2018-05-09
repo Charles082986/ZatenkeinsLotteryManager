@@ -55,7 +55,6 @@ function ZLM_SortScoreboard(a,b)
         return a.Points > b.Points; --Sort scores from largest to smallest.
     end
 end
-
 ZLM = LibStub("AceAddon-3.0"):NewAddon("ZatenkeinsLotteryManager", "AceConsole-3.0", "AceEvent-3.0");
 ZLM_OptionsTable = {
     type = "group",
@@ -125,15 +124,15 @@ ZLM_OptionsTable = {
                     desc = "The chat type to use for lottery announcements. (GUILD, WHISPER, etc)",
                     type = "select",
                     values = { GUILD = "GUILD",  SAY = "SAY", WHISPER = "WHISPER" },
-                    get = "GetOutputChatType", -- NYI
-                    set = "SetOutputChatType" -- NYI
+                    get = "GetOutputChatType",
+                    set = "SetOutputChatType"
                 },
                 outputChatChannel = {
                     name = "Output Channel",
                     desc = "The channel or whisper target you wish to send lottery announcements too.",
                     type = "input",
-                    get = "GetOutputChannel", -- NYI
-                    set = "SetOutputChannel" -- NYI
+                    get = "GetOutputChannel",
+                    set = "SetOutputChannel"
                 }
             },
         },
@@ -142,16 +141,53 @@ ZLM_OptionsTable = {
             type = "execute",
             func = function()
                 ZLM:ShowScoreboard();
-                ZLM:Debug("Showing Scoreboard");
+                ZLM:Debug("Showing Scoreboard",1);
             end,
             order = 0
         },
+        bountyboard = {
+            name = "Bountyboard",
+            type = "execute",
+            func = function()
+                ZLM:ShowBountyboard();
+                ZLM:Debug("Showing Bountyboard",1)
+            end
+        }
     }
 };
 function ZLM:Debug(message,severity)
     --if self.db.profile.PrintLevel < severity then
         self:Print(message);
     --end
+end
+ZLM.WaitTable = {};
+ZLM.WaitFrame = nil;
+function ZLM:Wait(delay,func,...)
+    if(type(delay)~="number" or type(func)~="function") then
+        return false;
+    end
+    if(waitFrame == nil) then
+        ZLM.WaitFrame = CreateFrame("Frame","WaitFrame", UIParent);
+        ZLM.WaitFrame:SetScript("onUpdate",function (self,elapse)
+            local count = #ZLM.WaitTable;
+            local i = 1;
+            while(i<=count) do
+                local waitRecord = tremove(ZLM.WaitTable,i);
+                local d = tremove(waitRecord,1);
+                local f = tremove(waitRecord,1);
+                local p = tremove(waitRecord,1);
+                if(d>elapse) then
+                    tinsert(ZLM.WaitTable,i,{d-elapse,f,p});
+                    i = i + 1;
+                else
+                    count = count - 1;
+                    f(unpack(p));
+                end
+            end
+        end);
+    end
+    tinsert(ZLM.WaitTable,{delay,func,{...}});
+    return true;
 end
 
 ZLM:Debug("ZLM instantiated.",1);
@@ -167,6 +203,7 @@ function ZLM:OnInitialize()
     self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("ZatenkeinsLotteryManager", "ZLM");
     self:Debug("OptionsFrame added to BlizOptions.",1);
     self:Print("ZLM Loaded");
+    if not self.db.profile.Settings then self.db.profile.Settings = {}; end
 end
 function ZLM:OnEnable()
     --Register events here.
@@ -175,44 +212,57 @@ function ZLM:OnDisable()
     --Unregister events here.
 end
 function ZLM:SetEnabled(_,value)
-    self.db.profile.Enabled = value;
+    self.db.profile.Settings.Enabled = value;
     ZLM:Debug("Setter Event - Property: Enabled, Value: " .. string.format("%s",value),1);
 end
 function ZLM:GetEnabled(_)
-    return self.db.profile.Enabled;
+    return self.db.profile.Settings.Enabled;
 end
 function ZLM:SetPrintLevel(_,value)
-    self.db.profile.PrintLevel = value;
+    self.db.profile.Settings.PrintLevel = value;
     ZLM:Debug("Setter Event - Property: PrintLevel, Value: " .. string.format("%s",value),1);
 end
 function ZLM:GetPrintLevel(_)
-    return self.db.profile.PrintLevel;
+    return self.db.profile.Settings.PrintLevel;
 end
 function ZLM:SetLotteryMethod(_,value)
-    self.db.profile.LotteryMethod = value;
+    self.db.profile.Settings.LotteryMethod = value;
     ZLM:Debug("Setter Event - Property: LotteryMethod, Value: " .. string.format("%s",value),1);
 end
 function ZLM:GetLotteryMethod(_)
-    return self.db.profile.LotteryMethod;
+    return self.db.profile.Settings.LotteryMethod;
 end
 function ZLM:SetWinnerCount(_, value)
-    self.db.profile.NumberOfWinners = value;
+    self.db.profile.Settings.NumberOfWinners = value;
     ZLM:Debug("Setter Event - Property: WinnerCount, Value: " .. string.format("%s",value),1);
 end
 function ZLM:GetWinnerCount(_)
-    return self.db.profile.NumberOfWinners;
+    return self.db.profile.Settings.NumberOfWinners;
 end
 function ZLM:SetExclusiveWinners(_, value)
-    self.db.profile.ExclusiveWinners = value;
+    self.db.profile.Settings.ExclusiveWinners = value;
     ZLM:Debug("Setter Event - Property: ExclusiveWinners, Value: " .. string.format("%s",value),1);
 end
 function ZLM:GetExclusiveWinners(_)
-    return self.db.profile.ExclusiveWinners;
+    return self.db.profile.Settings.ExclusiveWinners;
 end
+function ZLM:SetOutputChannel(_,value) 
+    self.db.profile.Settings.OutputChannel = value;
+end
+function ZLM:GetOutputChannel(_) 
+    return self.db.profile.Settings.OutputChannel;
+end
+function ZLM:SetOutputChatType(_,value)
+    self.db.profile.Settings.OutputChatType = value;
+end
+function ZLM:GetOutputChatType(_)
+    return self.db.profile.Settings.OutputChatType;
+end
+
 function ZLM:RunLottery() -- TO DO: Needs update without params.
 	ZLM:UpdateScoreboard();
-	local lotteryMethod = self.db.profile.LotteryMethod;
-	local lotteryWinnerCount = self.db.profile.NumberOfWinners;
+	local lotteryMethod = self.db.profile.Settings.LotteryMethod;
+	local lotteryWinnerCount = self.db.profile.Settings.NumberOfWinners;
 	local winners = {};
 	if lotteryMethod == ZLM_LotteryMethod.Competition then
 		winners = self:GetCompetitionWinners(lotteryWinnerCount)
@@ -223,11 +273,18 @@ function ZLM:RunLottery() -- TO DO: Needs update without params.
 end
 function ZLM:UpdateScoreboard()
 	local donations = GetDonationsWithinTimeFrame();
-    local pointsTable = {} -- TO DO: Get assoiative array of ItemID and Points.
+    local pointsTable = {};
+    for _,v in ipairs(ZLM.db.profile.Bounties) do
+        if v.HotItem then
+            pointsTable[v.ItemId] = v.Points * 2;
+        else
+            pointsTable[v.ItemId] = v.Points;
+        end
+    end
     ZLM_ScoreboardData = {};
     local tempPoints = {};
     for _,v in ipairs(donations) do
-        local points = pointsTalbe[v.ItemId] * v.Quantity;
+        local points = pointsTable[v.ItemId] * v.Quantity;
         if not not tempPoints[v.Name] then tempPoints[v.Name] = tempPoints[v.Name] + points; else tempPoints[v.Name] = points; end
     end
     for k,v in pairs(tempPoints) do
@@ -314,32 +371,50 @@ function ZLM:GetTieResults(winners)
     return sortableResults;
 end
 function ZLM:ShowScoreboard()
-    ZLM:Debug("Showing Scoreboard.", 1);
-    local scoreboard = ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
-        ,{ GetWinners = function()
-            ZLM:UpdateScoreboard();
-            ZLM:RunLottery();
-        end,
-        UpdateScoreboard = function()
-            ZLM:UpdateScoreboard();
-        end,
-        DateChanged = function(controlKey,segmentKey,value)
-            ZLM:Debug("Updating DateTime for " .. controlKey .. "DatePicker." .. segmentKey .. " to " .. value .. ".",1)
-            ZLM.db.profile[controlKey .. "DatePicker"][segmentKey] = value;
-            ZLM.db.profile[controlKey] = time(ZLM.db.profile[controlKey .. "DatePicker"]);
-        end,
-        AnnounceScoreboard = function() print("beep boop"); end,
-        AnnounceQuantityChanged = function() print("doobadee"); end},
-        { StartDate = ZLM.db.profile.ScoreboardStartDateTimeDatePicker, EndDate = ZLM.db.profile.ScoreboardEndDateTimeDatePicker, AnnounceQuantity = 5 });
-    table.sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
-    for i,v in ipairs(ZLM_ScoreboardData) do
-        local record = v;
-        record.Rank = i;
-        scoreboard.Table.DataFrame:AddRow(record);
+    if not not ZLM.scoreboard then
+        ZLM.scoreboard:Terminate();
+    else
+        ZLM:Debug("Showing Scoreboard.", 1);
+        local scoreboard = ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
+            ,{ GetWinners = function()
+                ZLM:UpdateScoreboard();
+                ZLM:RunLottery();
+            end,
+            UpdateScoreboard = function()
+                ZLM:UpdateScoreboard();
+            end,
+            DateChanged = function(controlKey,segmentKey,value)
+                ZLM:Debug("Updating DateTime for " .. controlKey .. "DatePicker." .. segmentKey .. " to " .. value .. ".",1)
+                ZLM.db.profile[controlKey .. "DatePicker"][segmentKey] = value;
+                ZLM.db.profile[controlKey] = time(ZLM.db.profile[controlKey .. "DatePicker"]);
+            end,
+            AnnounceScoreboard = function() print("beep boop"); end,
+            AnnounceQuantityChanged = function() print("doobadee"); end},
+            { StartDate = ZLM.db.profile.ScoreboardStartDateTimeDatePicker, EndDate = ZLM.db.profile.ScoreboardEndDateTimeDatePicker, AnnounceQuantity = 5 });
+        table.sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
+        for i,v in ipairs(ZLM_ScoreboardData) do
+            local record = v;
+            record.Rank = i;
+            scoreboard.Table:AddRow(record);
+        end
+        ZLM.scoreboard = scoreboard;
     end
-    ZLM.scoreboard = scoreboard;
-end
 
+end
+function ZLM:ShowBountyboard()
+    if not not ZLM.bountyboard then
+        ZLM.bountyboard:Terminate();
+    else
+        ZLM:Debug("Showing Bountyboard",1);
+        local bountyBoard = ZLM_Bountyboard:new("Zatenkein's Lottery Manager - Bountyboard", {
+                AddBounty = function()
+                    ZLM.bountyboard.Table:AddRow({ ItemId = nil, ItemLink = "", Points = 0, HotItem = false})
+                end
+            }
+        );
+        ZLM.bountyboard = bountyBoard;
+    end
+end
 function ZLM:GetDonationsWithinTimeframe()
     local time1 = time(self.db.profile.ScoreboardStartDateTimeDatePicker);
     local time2 = time(self.db.profile.ScoreboardEndDateTimeDatePicker);

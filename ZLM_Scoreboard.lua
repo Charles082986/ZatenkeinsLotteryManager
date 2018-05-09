@@ -10,6 +10,11 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
         widget:ReleaseChildren();
         AceGUI:Release(widget);
     end);
+    function topContainer:Terminate()
+        ZLM.scoreboard = nil;
+        self:ReleaseChildren();
+        self:Release();
+    end
     --END: Creating the primary Scoreboard frame.
     --BEGIN: Creating the button container.
     local buttonContainer = AceGUI:Create("SimpleGroup");
@@ -27,16 +32,19 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
     --END: Creating Datepickers
     --BEGIN: Creating Table
     topContainer.Table = ZLM_Table:new({
-        Rank = { Width = 0.1, Type = "Label" },
-        Name = { Width = 0.35, Type = "Label" },
-        Points = { Width = 0.25, Type = "Label" },
-        Min = { Width = 0.15, Type = "Label" },
-        Max = { Width = 0.15, Type = "Label" },
+        Rank = { Width = 0.1, Type = ZLM_Table.Types.Label },
+        Name = { Width = 0.35, Type = ZLM_Table.Types.Label },
+        Points = { Width = 0.25, Type = ZLM_Table.Types.Label },
+        Min = { Width = 0.15, Type = ZLM_Table.Types.Label },
+        Max = { Width = 0.15, Type = ZLM_Table.Types.Label },
     },{"Rank","Name","Points","Min","Max"}, AceGUI);
     function topContainer:AddRow(dataObj,AceGUI)
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
-        --TO DO: Restructure incoming DataObj to include correct content and callbackArgs.
-        self.Table.DataFrame(dataObj,AceGUI);
+        local rowObj = {};
+        for k,v in pairs(dataObj) do
+            rowObj[k] = { Content = v };
+        end
+        self.Table.DataFrame:AddRow(rowObj,AceGUI);
     end
     topContainer.StartDatePicker = startDateDatePicker;
     topContainer.EndDatePicker = endDateDatePicker;
@@ -88,6 +96,10 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
     topContainer:AddChild(datepickerContainer);
     topContainer:AddChild(buttonContainer);
     topContainer:AddChild(topContainer.Table.MainFrame);
+    --for i = 1,5 do
+        topContainer:AddRow({ Rank = 1, Name = "Norbergenson-Alterac Mountains", Points = 50000, Min = 1, Max = 50000 })
+    --end
+
     return topContainer;
 end
 
