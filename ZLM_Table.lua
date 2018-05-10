@@ -42,15 +42,17 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
             local item = {};
             local width = structureArray[v].Width;
             if type == ZLM_Table.Types.InteractiveLabel then
-                item = ZLM_InteractiveLabel:new(data.Content, width, data.ClickFunc, data.EnterFunc, data.LeaveFunc, AceGUI)
+                item = ZLM_InteractiveLabel:new(data.Content, width, data.OnClick, data.OnEnter, data.OnLeave, AceGUI)
             elseif type == ZLM_Table.Types.Label then
                 item = ZLM_Label:new(data.Content,width,AceGUI);
             elseif type == ZLM_Table.Types.Button then
-                item = ZLM_Button:new(data.Content, data.Func, width, AceGUI);
+                item = ZLM_Button:new(data.Content, data.OnClick, width, AceGUI);
             elseif type == ZLM_Table.Types.Input then
-                item = ZLM_Input:new(width, data.Update, AceGUI, data.Content);
+                item = ZLM_EditBox:new(width, data.OnEnterPressed, AceGUI, data.Value);
             elseif type == ZLM_Table.Types.Dropdown then
-                item = ZLM_Dropdown:new()
+                item = ZLM_Dropdown:new(width,data.List,data.ListOrder,data.OnValueChanged, AceGUI, data.Value);
+            elseif type == ZLM_Table.Types.Toggle then
+                item = ZLM_Checkbox:new(width,data.OnValueChanged,AceGUI,data.State);
             end
             rowGroup[v] = item;
             rowGroup:AddChild(item);

@@ -67,8 +67,8 @@ function ZLM_Range:new(label,min,max,step,width,callback,AceGUI,defaultValue)
 end
 ZLM_Controls["Range"] = ZLM_Range;
 
-ZLM_Input = {};
-function ZLM_Input:new(width,callback,AceGUI,defaultValue)
+ZLM_EditBox = {};
+function ZLM_EditBox:new(width,callback,AceGUI,defaultValue)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     if not not defaultValue then defaultValue = ""; end
     local input = AceGUI:Create("EditBox");
