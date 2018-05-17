@@ -114,7 +114,7 @@ ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,snapshot)
         ZLM:Debug("Attempting to restart semaphore...",1)
         ZLM:EmptyLetterContents(innerMailIndex2,snapshot);
     else
-        ZLM:EndGetMailItems(innerMailIndex2,sender,snapshot);
+        ZLM:EndGetMailItems(sender,snapshot);
     end
 end
 
@@ -129,7 +129,7 @@ function ZLM:BeginGetMailItems()
     end
 end
 
-function ZLM:EndGetMailItems(sender)
+function ZLM:EndGetMailItems(sender,initialSnapshot)
     local mailContents = self:CompareSnapshots(self:GetInventorySnapshot(),initialSnapshot);
     for k,v in pairs(mailContents) do
         sender = ZLM:FullName(sender)
