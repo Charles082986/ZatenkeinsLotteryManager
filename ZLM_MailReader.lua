@@ -84,7 +84,7 @@ end
 
 function ZLM:EmptyLetterContents(mailInfo,snapshot)
     local mailIndex = mailInfo.index;
-    ZLM.MailSemaphore:renew(12,function(innerMailIndex,snapshot)
+    ZLM.MailSemaphore:renew(12,function(self,innerMailIndex,snapshot)
         ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex), 1);
         CheckInbox();
         ZLM:Wait(0.1,function(innerMailIndex2,snapshot)
