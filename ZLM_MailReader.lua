@@ -57,6 +57,7 @@ function ZLM:GetInventorySnapshot()
             end
         end
     end
+    ZLM:Debug("Getting inventory snapshot. " .. tostring(Snapshot), 1);
     return Snapshot;
 end
 
@@ -87,6 +88,7 @@ function ZLM:GetNextMailData()
 end
 
 function ZLM:EmptyLetterContents(mailIndex,snapshot)
+    ZLM:Debug("Beginning EmptyLetterContents - mailIndex: " .. mailIndex .. " snapshot: " .. tostring(snapshot), 1);
     ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,mailIndex,snapshot)
     for i = 1,12 do
         ZLM:Wait(i / 10,ZLM_WaitFunction_TakeInboxItem,mailIndex,i);
