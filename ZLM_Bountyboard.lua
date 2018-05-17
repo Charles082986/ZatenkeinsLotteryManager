@@ -49,8 +49,8 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
                             ZLM.db.profile.Bounties[index].Points = me.parent.children[5]:GetText();
                             ZLM.db.profile.Bounties[index].HotItem = me.parent.children[6]:GetValue();
                             me.parent.children[2]:SetText(itemLink);
-                            me.parent.children[2]:SetCallback("OnEnter",ZLM:MakeTooltip(itemLink));
-                            me.parent.children[2]:SetCallback("OnLeave",ZLM:ClearTooltip())
+                            me.parent.children[2]:SetCallback("OnEnter",function() ZLM:MakeTooltip(itemLink) end);
+                            me.parent.children[2]:SetCallback("OnLeave",function() ZLM:ClearTooltip() end)
                         end
                         ,text
                         ,itemLink
@@ -59,7 +59,7 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
                 end
             end
         };
-        rowObj.Name = { Value = dataObj.ItemLink, OnEnter = ZLM:MakeTooltip, OnLeave = ZLM:ClearTooltip };
+        rowObj.Name = { Value = dataObj.ItemLink, OnEnter = function(me,_) ZLM:MakeTooltip(me.GetText()); end, OnLeave = ZLM.ClearTooltip };
         rowObj.Points = { Value = dataObj.Points,
             OnEnterPressed = function(me,_,text)
                 local itemId = me.parent.children[1]:GetText();

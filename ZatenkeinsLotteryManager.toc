@@ -15,4 +15,5 @@ ZLM_Bountyboard.lua
 ZLM_Controls.lua
 ZLM_DatePicker.lua
 ZLM_Table.lua
+ZLM_MailReader.lua
 
