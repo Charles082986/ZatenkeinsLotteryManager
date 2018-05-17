@@ -10,6 +10,7 @@ ZLM.MailWorkerStates = {
 }
 ZLM.MailWorker = ZLM.MailWorkerStates.Available;
 function ZLM.MailSemaphore:renew(count,callback,...)
+    ZLM:Debug("Creating Semaphore: " .. tostring(...));
     self.Count = count;
     self.Itterations = 0;
     self._callback = callback;
