@@ -82,26 +82,29 @@ function ZLM:GetNextMailData()
     return nil;
 end
 
-function ZLM:EmptyLetterContents(mailInfo,snapshot)
-    local mailIndex = mailInfo.index;
-    ZLM.MailSemaphore:renew(12,function(self,innerMailIndex,snapshot)
-        ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex), 1);
-        CheckInbox();
-        ZLM:Wait(0.1,function(innerMailIndex2,snapshot)
-            ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2), 1);
-            local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
-            textCreated, canReply, isGM = GetInboxHeaderInfo(innerMailIndex2);
-            if hasItem and hasItem > 0 and ZLM.MailState == ZLM.MailStateOptions.Open then
-                ZLM:EmptyLetterContents(innerMailIndex2);
-            else
-                ZLM:EndGetMailItems(innerMailIndex2,sender,snapshot);
-            end
-        end,innerMailIndex,snapshot)
-    end,mailIndex,snapshot);
+function ZLM:EmptyLetterContents(mailIndex,snapshot)
+    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,mailIndex,snapshot)
     for i = 1,12 do
         ZLM:Wait(i / 10,function(a,b) TakeInboxItem(a,b); ZLM.MailSemaphore:Itterate(); end,mailIndex,i);
     end
     return true;
+end
+
+ZLM_SemaphoreCallback_EmptyLetterContents = function(self,innerMailIndex,snapshot)
+    ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex), 1);
+    CheckInbox();
+    ZLM:Wait(0.1,ZLM_WaitFucntion_EmptyLetterContents,innerMailIndex,snapshot)
+end
+
+ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,snapshot)
+    ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2), 1);
+    local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
+    textCreated, canReply, isGM = GetInboxHeaderInfo(innerMailIndex2);
+    if hasItem and hasItem > 0 and ZLM.MailState == ZLM.MailStateOptions.Open then
+        ZLM:EmptyLetterContents(innerMailIndex2);
+    else
+        ZLM:EndGetMailItems(innerMailIndex2,sender,snapshot);
+    end
 end
 
 function ZLM:BeginGetMailItems()
@@ -110,7 +113,7 @@ function ZLM:BeginGetMailItems()
         local mailInfo = self:GetNextMailData();
         if not not mailInfo then
             local initialSnapshot = self:GetInventorySnapshot();
-            ZLM:EmptyLetterContents(mailInfo,initialSnapshot)
+            ZLM:EmptyLetterContents(mailInfo.index,initialSnapshot)
         end
     end
 end
