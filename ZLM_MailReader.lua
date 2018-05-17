@@ -47,7 +47,7 @@ function ZLM:GetNextMailData()
             sender = ZLM.Mail:FullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
         end
         if hasItem and hasItem > 0 and not not sender then
-            return i;
+            return { index = i, sender = sender };
         end
     end
     return nil;
@@ -66,5 +66,16 @@ function ZLM:EmptyLetterContents(mailIndex)
     return true;
 end
 
-function ZLM:GetMailItems
+function ZLM:GetMailItems()
+    local mailInfo = self:GetNextMailIndex();
+    while not not mailInfo do
+        local initialSnapshot = self:GetInventorySnapshot();
+        self:EmptyLetterContents(mailInfo.index);
+        local mailContents = self:CompareSnapshots(self:GetInventorySnapshot(),initialSnapshot);
+        for k,v in pairs(mailContents) do
+            if v > 0 then ZLM:LogDonation(mailInfo.sender,k,v,time()); end
+        end
+        mailInfo = self:GetNextMailIndex();
+    end
+end
 
