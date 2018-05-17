@@ -99,7 +99,6 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
     --for i = 1,5 do
         topContainer:AddRow({ Rank = 1, Name = "Norbergenson-Alterac Mountains", Points = 50000, Min = 1, Max = 50000 })
     --end
-
     return topContainer;
 end
 

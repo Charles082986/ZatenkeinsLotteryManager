@@ -372,7 +372,7 @@ function ZLM:GetTieResults(winners)
 end
 function ZLM:ShowScoreboard()
     if not not ZLM.scoreboard then
-        ZLM.scoreboard:Terminate();
+
     else
         ZLM:Debug("Showing Scoreboard.", 1);
         local scoreboard = ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
@@ -442,6 +442,49 @@ function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a
         end
     end
 end
+
+function ZLM:LogLetter(letterIndex)
+    local itemList = ZLM:GetListOfLetterItems(letterIndex);
+    while #itemList > 0 do
+        for k,v in ipairs(itemList) do
+            ZLM:TakeItemfromLetter(letterIndex,k);
+        end
+        itemList = ZLM:GetListOfLetterItems(letterIndex);
+    end
+end
+function ZLM:GetListOfLetterItems(letterIndex)
+
+end
+function ZLM:TakeItemFromLetter(letterIndex,itemIndex)
+
+end
+function ZLM:LogItemPullAtempt(letterIndex,itemIndex)
+    --Code to move item from letter and log it as a "taken item".  Id is yyyy:mm:dd:hh:mm:ss:letterIndex:itemIndex.
+    local dateObj = date("*t");
+    local id = dateObj.year .. ":" .. dateObj.month .. ":" .. dateObj.day .. ":" .. dateObj.hour  .. ":" .. dateObj.minute  .. ":" .. dateObj.sec  .. ":" .. letterIndex  .. ":" .. itemIndex;
+    
+end
+
+
+function ZLM:LogItemReceipt(containerId)
+    local snapshot = ZLM:GetContainerSnapshot(containerId)
+    local itemGains = ZLM:CompareSnapshotToCurrent(containerId,snapshot);
+    local timeStamp = time();
+    for k,v in pairs(itemGains) do
+        ZLM:TryMatchReceipts(k,v,timeStamp);
+    end
+end
+function ZLM:GetContainerSnapshot(containerId)
+
+end
+function ZLM:CompareSnapshotToCurrent(containerId,containerSnapshot)
+
+end
+
+function ZLM:TryMatchReceipts(itemId,quantity,timestamp)
+
+end
+
 
 ZLM_Donation = {
     Name = "Defaultname-Default Realm",
