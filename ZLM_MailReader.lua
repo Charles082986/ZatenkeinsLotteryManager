@@ -90,7 +90,7 @@ end
 
 function ZLM:EmptyLetterContents(mailIndex,snapshot)
     ZLM:Debug("Beginning EmptyLetterContents - mailIndex: " .. mailIndex .. " snapshot: " .. tostring(snapshot), 1);
-    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,mailIndex,snapshot)
+    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,{ mailIndex,snapshot });
     for i = 1,12 do
         ZLM:Wait(i / 10,ZLM_WaitFunction_TakeInboxItem,mailIndex,i);
     end
@@ -103,7 +103,9 @@ ZLM_WaitFunction_TakeInboxItem = function(mailIndex,itemIndex)
     ZLM.MailSemaphore:Itterate();
 end
 
-ZLM_SemaphoreCallback_EmptyLetterContents = function(self,innerMailIndex,snapshot)
+ZLM_SemaphoreCallback_EmptyLetterContents = function(self,args)
+    local innerMailIndex = args[1];
+    local snapshot = args[2];
     ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex) .. "  Snapshot: " .. tostring(snapshot), 1);
     CheckInbox();
     ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents,innerMailIndex,snapshot)
