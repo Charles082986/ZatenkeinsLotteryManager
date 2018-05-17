@@ -1,3 +1,22 @@
+ZLM.MailSemaphore = {}
+function ZLM.MailSemaphore:renew(count,callback,...)
+    self.Count = 0;
+    self.Itterations = 0;
+    self._callback = callback;
+    self._args = ...;
+    function self:AddCount(increase)
+        if not not increase then increase = 1; end
+        self.Count = self.Count + increase;
+    end
+    function self:Itterate(increase)
+        if not not increase then increase = 1; end
+        self.Itterations = self.Itterations + increase;
+        if self.Itterations >= self.Count then
+            self:_callback(self._args);
+        end
+    end
+end
+
 function ZLM:FullName(name)
     -- Sinderion -> Sinderion-ShadowCouncil (add server name to same-server sender);   Xaionics-BlackwaterRaiders -> Xaionics-BlackwaterRaiders (no change if it's already full)
     if type(name) ~= "string" then
@@ -53,29 +72,40 @@ function ZLM:GetNextMailData()
     return nil;
 end
 
-function ZLM:EmptyLetterContents(mailIndex)
-    local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
-    textCreated, canReply, isGM = GetInboxHeaderInfo(mailIndex);
-    while hasItem and hasItem > 0 do
-        for i = 1,12 do
-            TakeInboxItem(mailIndex,i);
-        end
-        packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
-        textCreated, canReply, isGM = GetInboxHeaderInfo(mailIndex);
+function ZLM:EmptyLetterContents(mailInfo,snapshot)
+    local mailIndex = mailInfo.index;
+    ZLM.MailSemaphore:renew(12,function(mailIndex,snapshot)
+        CheckInbox();
+        ZLM:Wait(0.1,function(mailIndex,snapshot)
+            local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
+            textCreated, canReply, isGM = GetInboxHeaderInfo(mailIndex);
+            if hasItem and hasItem > 0 then
+                ZLM:EmptyLetterContents(mailIndex);
+            else
+                ZLM:EndGetMailItems(mailIndex,sender,snapshot);
+            end
+        end,mailIndex,snapshot)
+    end,mailIndex,snapshot);
+    for i = 1,12 do
+        ZLM:Wait(i / 10,function(a,b) TakeInboxItem(a,b); ZLM.MailSemaphore:Itterate(); end,mailIndex,i);
     end
     return true;
 end
 
-function ZLM:GetMailItems()
-    local mailInfo = self:GetNextMailIndex();
-    while not not mailInfo do
+function ZLM:BeginGetMailItems()
+    local mailInfo = self:GetNextMailData();
+    if not not mailInfo then
         local initialSnapshot = self:GetInventorySnapshot();
-        self:EmptyLetterContents(mailInfo.index);
-        local mailContents = self:CompareSnapshots(self:GetInventorySnapshot(),initialSnapshot);
-        for k,v in pairs(mailContents) do
-            if v > 0 then ZLM:LogDonation(mailInfo.sender,k,v,time()); end
-        end
+        ZLM:EmptyLetterContents(mailInfo,initialSnapshot)
         mailInfo = self:GetNextMailIndex();
     end
 end
 
+function ZLM:EndGetMailItems(sender)
+    local mailContents = self:CompareSnapshots(self:GetInventorySnapshot(),initialSnapshot);
+    for k,v in pairs(mailContents) do
+        sender = ZLM:FullName(sender)
+        if v > 0 then ZLM:LogDonation(sender,k,v,time()); end
+    end
+    ZLM:BeginGetMailItems();
+end
