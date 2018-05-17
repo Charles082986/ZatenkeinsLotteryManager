@@ -73,7 +73,7 @@ function ZLM:GetNextMailData()
         local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
         textCreated, canReply, isGM = GetInboxHeaderInfo(i);
         if sender then
-            sender = ZLM.Mail:FullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
+            sender = ZLM:FullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
         end
         if hasItem and hasItem > 0 and not not sender then
             return { index = i, sender = sender };
