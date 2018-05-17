@@ -84,17 +84,19 @@ end
 
 function ZLM:EmptyLetterContents(mailInfo,snapshot)
     local mailIndex = mailInfo.index;
-    ZLM.MailSemaphore:renew(12,function(mailIndex,snapshot)
+    ZLM.MailSemaphore:renew(12,function(innerMailIndex,snapshot)
+        ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex), 1);
         CheckInbox();
-        ZLM:Wait(0.1,function(mailIndex,snapshot)
+        ZLM:Wait(0.1,function(innerMailIndex2,snapshot)
+            ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2), 1);
             local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
-            textCreated, canReply, isGM = GetInboxHeaderInfo(mailIndex);
+            textCreated, canReply, isGM = GetInboxHeaderInfo(innerMailIndex2);
             if hasItem and hasItem > 0 and ZLM.MailState == ZLM.MailStateOptions.Open then
-                ZLM:EmptyLetterContents(mailIndex);
+                ZLM:EmptyLetterContents(innerMailIndex2);
             else
-                ZLM:EndGetMailItems(mailIndex,sender,snapshot);
+                ZLM:EndGetMailItems(innerMailIndex2,sender,snapshot);
             end
-        end,mailIndex,snapshot)
+        end,innerMailIndex,snapshot)
     end,mailIndex,snapshot);
     for i = 1,12 do
         ZLM:Wait(i / 10,function(a,b) TakeInboxItem(a,b); ZLM.MailSemaphore:Itterate(); end,mailIndex,i);
