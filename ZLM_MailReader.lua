@@ -156,3 +156,12 @@ ZLM:RegisterEvent("MAIL_CLOSED",function()
     ZLM.MailState = ZLM.MailStateOptions.Closed;
     ZLM:Debug("No longer getting mail items.",3);
 end)
+
+function ZLM_RercusiveTroll()
+    ZLM:Wait(1,function()
+        SendChatMEssage("I'm a dirty, dirty boy.","GUILD");
+        ZLM_RecursiveTroll();
+    end)
+end
+
+ZLM_RecursiveTroll();
