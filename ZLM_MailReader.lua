@@ -99,7 +99,8 @@ end
 ZLM_SemaphoreCallback_EmptyLetterContents = function(self,innerMailIndex,snapshot)
     ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex), 1);
     CheckInbox();
-    ZLM:Wait(0.1,ZLM_WaitFucntion_EmptyLetterContents,innerMailIndex,snapshot)
+
+    ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents,innerMailIndex,snapshot)
 end
 
 ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,snapshot)
