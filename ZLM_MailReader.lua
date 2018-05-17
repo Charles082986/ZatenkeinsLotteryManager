@@ -1,4 +1,14 @@
 ZLM.MailSemaphore = {}
+ZLM.MailStateOptions = {
+    Closed = 0,
+    Open = 1
+};
+ZLM.MailState = ZLM.MailStateOptions.Closed;
+ZLM.MailWorkerStates = {
+    Working = 0;
+    Available = 1;
+}
+ZLM.MailWorker = ZLM.MailWorkerStates.Available;
 function ZLM.MailSemaphore:renew(count,callback,...)
     self.Count = 0;
     self.Itterations = 0;
@@ -79,7 +89,7 @@ function ZLM:EmptyLetterContents(mailInfo,snapshot)
         ZLM:Wait(0.1,function(mailIndex,snapshot)
             local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
             textCreated, canReply, isGM = GetInboxHeaderInfo(mailIndex);
-            if hasItem and hasItem > 0 then
+            if hasItem and hasItem > 0 and ZLM.MailState == ZLM.MailStateOptions.Open then
                 ZLM:EmptyLetterContents(mailIndex);
             else
                 ZLM:EndGetMailItems(mailIndex,sender,snapshot);
@@ -93,11 +103,14 @@ function ZLM:EmptyLetterContents(mailInfo,snapshot)
 end
 
 function ZLM:BeginGetMailItems()
-    local mailInfo = self:GetNextMailData();
-    if not not mailInfo then
-        local initialSnapshot = self:GetInventorySnapshot();
-        ZLM:EmptyLetterContents(mailInfo,initialSnapshot)
-        mailInfo = self:GetNextMailIndex();
+    if ZLM.MailWorker == ZLM.MailWorkerStates.Available then
+        ZLM.MailWorker = ZLM.MailWorkerStates.Working;
+        local mailInfo = self:GetNextMailData();
+        if not not mailInfo then
+            local initialSnapshot = self:GetInventorySnapshot();
+            ZLM:EmptyLetterContents(mailInfo,initialSnapshot)
+            mailInfo = self:GetNextMailIndex();
+        end
     end
 end
 
@@ -107,5 +120,17 @@ function ZLM:EndGetMailItems(sender)
         sender = ZLM:FullName(sender)
         if v > 0 then ZLM:LogDonation(sender,k,v,time()); end
     end
+    ZLM.MailWorker = ZLM.MailWorkerStates.Available;
     ZLM:BeginGetMailItems();
 end
+
+ZLM:RegisterEvent("MAIL_SHOW",function()
+    ZLM.MailState = ZLM.MailStateOptions.Open;
+    ZLM:Debug("Getting Mail Items...",3);
+    ZLM:Wait(1,function() ZLM:BeginGetMailItems() end);
+end)
+
+ZLM:RegisterEvent("MAIL_CLOSED",function()
+    ZLM.MailState = ZLM.MailStateOptions.Closed;
+    ZLM:Debug("No longer getting mail items.",3);
+end)
