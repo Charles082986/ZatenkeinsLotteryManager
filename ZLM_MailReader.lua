@@ -106,7 +106,7 @@ ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,snapshot)
     ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2), 1);
     local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
     textCreated, canReply, isGM = GetInboxHeaderInfo(innerMailIndex2);
-
+    ZLM:Debug("HasItem: " .. tostring(hasItem) .. ", ZLM.MailState = " .. ZLM.MailState,1);
     if hasItem and hasItem > 0 and ZLM.MailState == ZLM.MailStateOptions.Open then
         ZLM:Debug("Attempting to restart semaphore...",1)
         ZLM:EmptyLetterContents(innerMailIndex2,snapshot);
