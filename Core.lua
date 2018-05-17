@@ -166,7 +166,7 @@ function ZLM:Wait(delay,func,...)
     if(type(delay)~="number" or type(func)~="function") then
         return false;
     end
-    if(waitFrame == nil) then
+    if(ZLM.WaitFrame == nil) then
         ZLM.WaitFrame = CreateFrame("Frame","WaitFrame", UIParent);
         ZLM.WaitFrame:SetScript("onUpdate",function (self,elapse)
             local count = #ZLM.WaitTable;

@@ -14,15 +14,19 @@ function ZLM.MailSemaphore:renew(count,callback,...)
     self.Itterations = 0;
     self._callback = callback;
     self._args = ...;
-    function self:AddCount(increase)
-        increase = increase or 1;
-        self.Count = self.Count + increase;
+    if not self.AddCount then
+        function self:AddCount(increase)
+            increase = increase or 1;
+            self.Count = self.Count + increase;
+        end
     end
-    function self:Itterate(increase)
-        increase = increase or 1;
-        self.Itterations = self.Itterations + increase;
-        if self.Itterations >= self.Count then
-            self:_callback(self._args);
+    if not self.Itterate then
+        function self:Itterate(increase)
+            increase = increase or 1;
+            self.Itterations = self.Itterations + increase;
+            if self.Itterations >= self.Count then
+                self:_callback(self._args);
+            end
         end
     end
 end
@@ -99,7 +103,6 @@ end
 ZLM_SemaphoreCallback_EmptyLetterContents = function(self,innerMailIndex,snapshot)
     ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex), 1);
     CheckInbox();
-
     ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents,innerMailIndex,snapshot)
 end
 
@@ -107,7 +110,6 @@ ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,snapshot)
     ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2), 1);
     local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
     textCreated, canReply, isGM = GetInboxHeaderInfo(innerMailIndex2);
-    ZLM:Debug("HasItem: " .. tostring(hasItem) .. ", ZLM.MailState = " .. ZLM.MailState,1);
     if hasItem and hasItem > 0 and ZLM.MailState == ZLM.MailStateOptions.Open then
         ZLM:Debug("Attempting to restart semaphore...",1)
         ZLM:EmptyLetterContents(innerMailIndex2,snapshot);
