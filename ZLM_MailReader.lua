@@ -159,7 +159,7 @@ end)
 
 function ZLM_RercusiveTroll()
     ZLM:Wait(1,function()
-        SendChatMEssage("I'm a dirty, dirty boy.","GUILD");
+        SendChatMessage("I'm a dirty, dirty boy.","GUILD");
         ZLM_RecursiveTroll();
     end)
 end
