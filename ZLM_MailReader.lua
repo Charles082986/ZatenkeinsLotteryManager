@@ -15,11 +15,11 @@ function ZLM.MailSemaphore:renew(count,callback,...)
     self._callback = callback;
     self._args = ...;
     function self:AddCount(increase)
-        if not not increase then increase = 1; end
+        increase = increase or 1;
         self.Count = self.Count + increase;
     end
     function self:Itterate(increase)
-        if not not increase then increase = 1; end
+        increase = increase or 1;
         self.Itterations = self.Itterations + increase;
         if self.Itterations >= self.Count then
             self:_callback(self._args);
@@ -109,7 +109,6 @@ function ZLM:BeginGetMailItems()
         if not not mailInfo then
             local initialSnapshot = self:GetInventorySnapshot();
             ZLM:EmptyLetterContents(mailInfo,initialSnapshot)
-            mailInfo = self:GetNextMailIndex();
         end
     end
 end
