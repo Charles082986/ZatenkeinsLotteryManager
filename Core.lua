@@ -192,7 +192,8 @@ end
 
 ZLM:Debug("ZLM instantiated.",1);
 function ZLM:OnInitialize()
-    self.CharacterName, self.RealmName = UnitName("player");
+    self.CharacterName = UnitName("player");
+    self.RealmName = GetRealmName();
     self.CharacterIdentity = self.CharacterName .. "-" .. self.RealmName;
     self.db = LibStub("AceDB-3.0"):New("ZatenkeinsLotteryManagerDB", ZLM_OptionDefaults, true);
     if not not self.db then
@@ -438,11 +439,11 @@ function ZLM:GetDonationsWithinTimeframe()
     end
     return output;
 end
-function ZLM:RecordDonation(nameRealmCombo,itemId,quantity) -- Add a new record to the donation log.
+function ZLM:LogDonation(nameRealmCombo,itemId,quantity) -- Add a new record to the donation log.
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
     itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID,
     isCraftingReagent = GetItemInfo(itemId);
-    tinsert(ZLM.db.global.Donations,{ Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, ItemLink = itemLink});
+    tinsert(ZLM.db.global.Donations,{ Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, ItemLink = itemLink, timestamp = date("*t")});
 end
 function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a specific time.
     local purgeTime = time(dateObj);
@@ -452,10 +453,6 @@ function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a
             tremove(self.db.global.Donations,i);
         end
     end
-end
-
-function ZLM:LogDonation(sender,itemId,qty,timestamp)
-    ZLM:Debug("Donation Received! ItemId: " .. itemId .. ", Qty: " .. qty .. "Time: " .. timestamp,1);
 end
 
 

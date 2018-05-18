@@ -10,7 +10,9 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
     tableTitleContainer:SetLayout("Flow");
     tableTitleContainer:SetRelativeWidth(0.95);
     for _,v in ipairs(orderArray) do
-        tableTitleContainer:AddChild(ZLM_Label:new(v,structureArray[v].Width,AceGUI));
+        local width = structureArray[v].Width;
+        local label = ZLM_Label:new(v,width,AceGUI);
+        tableTitleContainer:AddChild(label);
     end
     tableContainer:AddChild(ZLM_Label:new(" ",0.025,AceGUI));
     tableContainer:AddChild(tableTitleContainer);
