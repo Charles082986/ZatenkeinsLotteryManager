@@ -37,7 +37,7 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
             Value = dataObj.ItemId
             , OnEnterPressed = ZLM_Bountyboard_ItemIdChangeCallback
         };
-        rowObj.Name = { Value = dataObj.ItemLink, OnEnter = ZLM_Bountyboard_ItemLinkMouseOverCallback, OnLeave = ZLM.ClearTooltip };
+        rowObj.Name = { Value = dataObj.ItemLink, OnEnter = ZLM_BountyBoard_MakeTooltip, OnLeave = ZLM.ClearTooltip };
         rowObj.Points = { Value = dataObj.Points,
             OnEnterPressed = ZLM_Bountyboard_PointsChangedCallback
         };
@@ -67,34 +67,35 @@ function ZLM_Bountyboard_ItemIdChangeCallback(me,_,text)
         local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(text);
         ZLM:Wait(
             1
-            ,function(text,itemLink,me)
-            text = tonumber(text);
-            local index = -1;
-            for i,v in ipairs(ZLM.db.profile.Bounties) do
-                if v.ItemId == text then index = i; break; end
-            end
-            if index < 1 then
-                index = #(ZLM.db.profile.Bounties) + 1;
-                ZLM.db.profile.Bounties[index] = {};
-            end
-            ZLM.db.profile.Bounties[index].ItemId = text;
-            ZLM.db.profile.Bounties[index].ItemLink = itemLink;
-            ZLM.db.profile.Bounties[index].Points = me.parent.children[5]:GetText();
-            ZLM.db.profile.Bounties[index].HotItem = me.parent.children[6]:GetValue();
-            me.parent.children[2]:SetText(itemLink);
-            me.parent.children[2]:SetCallback("OnEnter",function() ZLM:MakeTooltip(itemLink) end);
-            me.parent.children[2]:SetCallback("OnLeave",function() ZLM:ClearTooltip() end)
-        end
+            ,ZLM_BountyBoard_WaitFunction_ItemIdChangeCallback
             ,text
             ,itemLink
             ,me
         );
     end
 end
-function ZLM_Bountyboard_ItemLinkMouseOverCallback(me, _)
-    local txt = me.GetText();
-    if not not txt then
-        ZLM:MakeTooltip(txt);
+function ZLM_Bountyboard_WaitFunction_ItemIdChangeCallback(text,itemLink,me)
+    text = tonumber(text);
+    local index = -1;
+    for i,v in ipairs(ZLM.db.profile.Bounties) do
+        if v.ItemId == text then index = i; break; end
+    end
+    if index < 1 then
+        index = #(ZLM.db.profile.Bounties) + 1;
+        ZLM.db.profile.Bounties[index] = {};
+    end
+    ZLM.db.profile.Bounties[index].ItemId = text;
+    ZLM.db.profile.Bounties[index].ItemLink = itemLink;
+    ZLM.db.profile.Bounties[index].Points = me.parent.children[3]:GetText();
+    ZLM.db.profile.Bounties[index].HotItem = me.parent.children[4]:GetValue();
+    me.parent.children[2]:SetText(itemLink);
+    me.parent.children[2]:SetCallback("OnEnter",ZLM_BountyBoard_MakeTooltip,itemLink);
+    me.parent.children[2]:SetCallback("OnLeave",ZLM.ClearTooltip)
+end
+function ZLM_Bountyboard_MakeTooltip(me,_,itemLink)
+    itemLink = itemLink or me.parent.children[2]:GetText();
+    if not not itemLink then
+        ZLM:MakeTooltip(itemLink);
     end
 end
 function ZLM_Bountyboard_PointsChangeCallback(me,_,text)
