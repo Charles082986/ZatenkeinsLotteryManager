@@ -1,0 +1,2 @@
+# ZatenkeinsLotteryManager
+Manages Guild Lotteries
