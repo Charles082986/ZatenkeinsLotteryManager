@@ -160,7 +160,7 @@ ZLM_OptionsTable = {
     }
 };
 function ZLM:Debug(message,severity)
-    if (self.db.profile.PrintLevel or 3) < severity then
+    if (ZLM.db.profile.PrintLevel or 3) < severity then
         self:Print(message);
     end
 end
@@ -193,8 +193,6 @@ function ZLM:Wait(delay,func,...)
     tinsert(ZLM.WaitTable,{delay,func,{...}});
     return true;
 end
-
-ZLM:Debug("ZLM instantiated.",1);
 function ZLM:OnInitialize()
     self.CharacterName = UnitName("player");
     self.RealmName = GetRealmName();
@@ -216,6 +214,7 @@ function ZLM:OnInitialize()
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
     self.FrameStates = {};
 end
+ZLM:Debug("ZLM instantiated.",1);
 function ZLM:OnEnable()
     --Register events here.
 end
