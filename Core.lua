@@ -213,8 +213,9 @@ function ZLM:OnInitialize()
     if not self.db.global.Characters then self.db.global.Characters = {}; end
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
     self.FrameStates = {};
+    ZLM:Debug("ZLM instantiated.",1);
 end
-ZLM:Debug("ZLM instantiated.",1);
+
 function ZLM:OnEnable()
     --Register events here.
 end
