@@ -91,7 +91,7 @@ end
 
 function ZLM:EmptyLetterContents(mailIndex,sender,snapshot)
     ZLM:Debug("Beginning EmptyLetterContents - mailIndex: " .. mailIndex .. " snapshot: " .. tostring(snapshot), 1);
-    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,mailIndex,snapshot,sender);
+    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,mailIndex,sender,snapshot);
     for i = 1,12 do
         ZLM:Wait(i / 10,ZLM_WaitFunction_TakeInboxItem,mailIndex,i);
     end
