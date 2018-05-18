@@ -10,11 +10,10 @@ ZLM.MailWorkerStates = {
 }
 ZLM.MailWorker = ZLM.MailWorkerStates.Available;
 function ZLM.MailSemaphore:renew(count,callback,...)
-    ZLM:Debug("Creating Semaphore: " .. tostring(...));
     self.Count = count;
     self.Itterations = 0;
     self._callback = callback;
-    self._args = ...;
+    self._args = {...};
     if not self.AddCount then
         function self:AddCount(increase)
             increase = increase or 1;
@@ -26,7 +25,7 @@ function ZLM.MailSemaphore:renew(count,callback,...)
             increase = increase or 1;
             self.Itterations = self.Itterations + increase;
             if self.Itterations >= self.Count then
-                self:_callback(self._args);
+                self:_callback(unpack(self._args));
             end
         end
     end
@@ -34,6 +33,7 @@ end
 
 function ZLM:FullName(name)
     -- Sinderion -> Sinderion-ShadowCouncil (add server name to same-server sender);   Xaionics-BlackwaterRaiders -> Xaionics-BlackwaterRaiders (no change if it's already full)
+    ZLM:Debug("FullName - 1 - Name: ".. name, 1);
     if type(name) ~= "string" then
         return nil;
     end
@@ -43,7 +43,7 @@ function ZLM:FullName(name)
     else
         name = name .. "-" .. GetRealmName(); -- Name needs some TLC. Might accidentally get NPC's with one name. Oh well lol.
     end
-    --ZLM:Debug(name, 2);
+    ZLM:Debug("FullName - 2 - Name: ".. name, 1);
     return name;
 end
 
@@ -78,6 +78,7 @@ function ZLM:GetNextMailData()
     for i = 1, inbox_items do
         local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
         textCreated, canReply, isGM = GetInboxHeaderInfo(i);
+        ZLM:Debug("GetNextMailData - Sender: " .. sender);
         if sender then
             sender = ZLM:FullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
         end
@@ -90,7 +91,7 @@ end
 
 function ZLM:EmptyLetterContents(mailIndex,snapshot)
     ZLM:Debug("Beginning EmptyLetterContents - mailIndex: " .. mailIndex .. " snapshot: " .. tostring(snapshot), 1);
-    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,{ mailIndex,snapshot });
+    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,mailIndex,snapshot);
     for i = 1,12 do
         ZLM:Wait(i / 10,ZLM_WaitFunction_TakeInboxItem,mailIndex,i);
     end
