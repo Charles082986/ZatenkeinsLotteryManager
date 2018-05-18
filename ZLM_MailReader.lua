@@ -145,7 +145,7 @@ function ZLM:EndGetMailItems(sender,initialSnapshot)
         if v > 0 then
             ZLM:LogDonation(sender,k,v,time());
         elseif v < 0 then
-            ZLM:Debug("Somehow lost items... ItemId: " ..k .. " Quantity: "..v,1);
+            ZLM:Debug("Somehow lost items... ItemId: " ..k .. " Quantity: "..v,4);
         end
     end
     ZLM.MailWorker = ZLM.MailWorkerStates.Available;

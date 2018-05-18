@@ -79,7 +79,7 @@ ZLM_OptionsTable = {
                     desc = "Displays addon output messages.  Lower values show only urgent messages.  Higher values show all messages.",
                     type = "range",
                     min = 0,
-                    max = 4,
+                    max = 3,
                     step = 1,
                     bigStep = 1,
                     set = "SetPrintLevel",
@@ -156,9 +156,9 @@ ZLM_OptionsTable = {
     }
 };
 function ZLM:Debug(message,severity)
-    --if self.db.profile.PrintLevel < severity then
+    if (self.db.profile.PrintLevel or 3) < severity then
         self:Print(message);
-    --end
+    end
 end
 ZLM.WaitTable = {};
 ZLM.WaitFrame = nil;
