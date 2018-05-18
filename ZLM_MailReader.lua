@@ -33,7 +33,7 @@ end
 
 function ZLM:FullName(name)
     -- Sinderion -> Sinderion-ShadowCouncil (add server name to same-server sender);   Xaionics-BlackwaterRaiders -> Xaionics-BlackwaterRaiders (no change if it's already full)
-    ZLM:Debug("FullName - 1 - Name: ".. name, 1);
+    ZLM:Debug("FullName - 1 - Name: ".. tostring(name), 1);
     if type(name) ~= "string" then
         return nil;
     end
@@ -43,7 +43,7 @@ function ZLM:FullName(name)
     else
         name = name .. "-" .. GetRealmName(); -- Name needs some TLC. Might accidentally get NPC's with one name. Oh well lol.
     end
-    ZLM:Debug("FullName - 2 - Name: ".. name, 1);
+    ZLM:Debug("FullName - 2 - Name: ".. tostring(name), 1);
     return name;
 end
 
@@ -133,7 +133,6 @@ function ZLM:BeginGetMailItems()
 end
 
 function ZLM:EndGetMailItems(sender,initialSnapshot)
-    sender = ZLM:FullName(sender)
     ZLM:Debug("Ending Current Mail and calculating differences...",1);
     ZLM:Debug("Sender: " .. sender .. ", InitialSnapshot: " .. tostring(initialSnapshot));
     local mailContents = self:CompareSnapshots(self:GetInventorySnapshot(),initialSnapshot);
