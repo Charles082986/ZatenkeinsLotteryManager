@@ -109,12 +109,12 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
         };
         self.Table.DataFrame:AddRow(rowObj,AceGUI);
     end
-    topContainer:AddChild(topContainer.Table.MainFrame);
     local buttonContainer = AceGUI:Create("SimpleGroup");
     buttonContainer:SetRelativeWidth(1);
     buttonContainer:SetLayout("Flow");
     buttonContainer:AddChild(ZLM_Button:new("Add Bounty",callbacks.AddBounty,0.25,AceGUI));
     topContainer:AddChild(buttonContainer);
+    topContainer:AddChild(topContainer.Table.MainFrame);
     for _,v in ipairs(ZLM.db.profile.Bounties) do
         topContainer:AddRow(v,AceGUI)
     end
