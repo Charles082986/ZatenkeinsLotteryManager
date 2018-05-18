@@ -116,7 +116,7 @@ ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,snapshot)
     local _;
     ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2) .. " Snapshot: " .. tostring(snapshot), 1);
     _, _, ZLM_AsyncValuePlaceholder_MailHeaderInfo.Sender , _, _, _, _, ZLM_AsyncValuePlaceholder_MailHeaderInfo.HasItem, _, _, _, _, _ = GetInboxHeaderInfo(innerMailIndex2);
-    ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents_PostHeaderInfo,innerMailIndex2,snapshot);
+    ZLM:Wait(1,ZLM_WaitFunction_EmptyLetterContents_PostHeaderInfo,innerMailIndex2,snapshot);
 end
 
 ZLM_WaitFunction_EmptyLetterContents_PostHeaderInfo = function(innerMailIndex2,snapshot)
