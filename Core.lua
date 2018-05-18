@@ -65,12 +65,12 @@ ZLM_OptionsTable = {
             type="group",
             order = 0,
             args = {
-                enable = {
-                    name = "Enable",
-                    desc = "Enables/disables the addon",
+                recordDonations = {
+                    name = "Record Donations",
+                    desc = "Record Mail Items as Donations",
                     type = "toggle",
-                    set = "SetEnabled",
-                    get = "GetEnabled",
+                    set = "SetRecordDonations",
+                    get = "GetRecordDonations",
                     order = 1,
                     descStyle="inline"
                 },
@@ -192,6 +192,8 @@ end
 
 ZLM:Debug("ZLM instantiated.",1);
 function ZLM:OnInitialize()
+    self.CharacterName, self.RealmName = UnitName("player");
+    self.CharacterIdentity = self.CharacterName .. "-" .. self.RealmName;
     self.db = LibStub("AceDB-3.0"):New("ZatenkeinsLotteryManagerDB", ZLM_OptionDefaults, true);
     if not not self.db then
         self:Debug("DB Created.",1);
@@ -204,6 +206,9 @@ function ZLM:OnInitialize()
     self:Debug("OptionsFrame added to BlizOptions.",1);
     self:Print("ZLM Loaded");
     if not self.db.profile.Settings then self.db.profile.Settings = {}; end
+    if not self.db.profile.Bounties then self.db.profile.Bounties = {}; end
+    if not self.db.global.Characters then self.db.global.Characters = {}; end
+    if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
 end
 function ZLM:OnEnable()
     --Register events here.
@@ -257,6 +262,12 @@ function ZLM:SetOutputChatType(_,value)
 end
 function ZLM:GetOutputChatType(_)
     return self.db.profile.Settings.OutputChatType;
+end
+function ZLM:SetRecordDonations(_,value)
+    self.db.global.Characters[self.CharacterIdentity].RecordDonations = value;
+end
+function ZLM:GetRecordDonations(_)
+    return self.db.global.Characters[self.CharacterIdentity].RecordDonations or false;
 end
 
 function ZLM:RunLottery() -- TO DO: Needs update without params.
