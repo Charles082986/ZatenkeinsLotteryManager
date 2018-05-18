@@ -48,6 +48,10 @@ ZLM_OptionDefaults = {
         Prizes = {},
     }
 };
+ZLM_FrameStateOptions = {
+    Hidden = 0;
+    Shown = 1;
+};
 function ZLM_SortScoreboard(a,b)
     if a.Points == b.Points then
         return a.Name < b.Name --Sort names alphabetically if scores are equal
@@ -210,6 +214,7 @@ function ZLM:OnInitialize()
     if not self.db.profile.Bounties then self.db.profile.Bounties = {}; end
     if not self.db.global.Characters then self.db.global.Characters = {}; end
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
+    self.FrameStates = {};
 end
 function ZLM:OnEnable()
     --Register events here.
@@ -384,7 +389,14 @@ function ZLM:GetTieResults(winners)
 end
 function ZLM:ShowScoreboard()
     if not not ZLM.scoreboard then
-
+        if ZLM.FrameState.Scoreboard == ZLM_FrameStateOptions.Hidden then
+            ZLM.scoreboard:Show();
+            ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Shown;
+            ZLM:UpdateScoreboard();
+        else
+            ZLM.scoreboard:Hide();
+            ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Hidden;
+        end
     else
         ZLM:Debug("Showing Scoreboard.", 1);
         local scoreboard = ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
@@ -409,13 +421,20 @@ function ZLM:ShowScoreboard()
             record.Rank = i;
             scoreboard.Table:AddRow(record);
         end
+        ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Shown;
         ZLM.scoreboard = scoreboard;
     end
 
 end
 function ZLM:ShowBountyboard()
     if not not ZLM.bountyboard then
-        ZLM.bountyboard:Terminate();
+        if ZLM.FrameState.Bountyboard == ZLM_FrameStateOptions.Hidden then
+            ZLM.bountyboard:Show();
+            ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
+        else
+            ZLM.bountyboard:Hide();
+            ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Hidden;
+        end
     else
         ZLM:Debug("Showing Bountyboard",1);
         local bountyBoard = ZLM_Bountyboard:new("Zatenkein's Lottery Manager - Bountyboard", {
