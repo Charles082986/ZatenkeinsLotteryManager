@@ -160,6 +160,7 @@ ZLM_OptionsTable = {
     }
 };
 function ZLM:Debug(message,severity)
+    severity = severity or 1;
     if (ZLM.db.profile.PrintLevel or 3) < severity then
         self:Print(message);
     end
