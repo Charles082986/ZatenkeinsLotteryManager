@@ -47,7 +47,7 @@ function ZLM:FullName(name)
     return name;
 end
 
-function ZLM:GetInventorySnapshot()
+function ZLM:GetInventorySnapshot(flag)
     local Snapshot = {};
     for i= 1, 5 do
         local numberOfSlots = GetContainerNumSlots(i);
@@ -58,7 +58,11 @@ function ZLM:GetInventorySnapshot()
             end
         end
     end
-    ZLM:Debug("Getting inventory snapshot. " .. tostring(Snapshot), 1);
+    local keyCount = 0;
+    for _,_ in pairs(Snapshot) do
+        keyCount = keyCount + 1;
+    end
+    ZLM:Debug("Getting inventory snapshot. Type: " .. tostring(flag) .. " Keys: " .. tostring(keyCount), 1);
     return Snapshot;
 end
 
@@ -128,7 +132,7 @@ function ZLM:BeginGetMailItems()
         ZLM.MailWorker = ZLM.MailWorkerStates.Working;
         local mailInfo = self:GetNextMailData();
         if not not mailInfo then
-            ZLM:EmptyLetterContents(mailInfo.index,mailInfo.sender,self:GetInventorySnapshot())
+            ZLM:EmptyLetterContents(mailInfo.index,mailInfo.sender,self:GetInventorySnapshot("initial"))
         end
     end
 end
@@ -136,7 +140,7 @@ end
 function ZLM:EndGetMailItems(sender,initialSnapshot)
     ZLM:Debug("Ending Current Mail and calculating differences...",1);
     ZLM:Debug("Sender: " .. sender .. ", InitialSnapshot: " .. tostring(initialSnapshot));
-    local mailContents = ZLM:CompareSnapshots(ZLM:GetInventorySnapshot(),initialSnapshot);
+    local mailContents = ZLM:CompareSnapshots(ZLM:GetInventorySnapshot("current"),initialSnapshot);
     for k,v in pairs(mailContents) do
         if v > 0 then
             ZLM:LogDonation(sender,k,v,time());
