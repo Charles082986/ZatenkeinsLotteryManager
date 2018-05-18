@@ -114,6 +114,7 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
     buttonContainer:SetRelativeWidth(1);
     buttonContainer:SetLayout("Flow");
     buttonContainer:AddChild(ZLM_Button:new("Add Bounty",callbacks.AddBounty,0.25,AceGUI));
+    topContainer:AddChild(buttonContainer);
     for _,v in ipairs(ZLM.db.profile.Bounties) do
         topContainer:AddRow(v,AceGUI)
     end
