@@ -128,7 +128,7 @@ ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,sender,snapshot)
 end
 
 function ZLM:BeginGetMailItems()
-    if ZLM.MailWorker == ZLM.MailWorkerStates.Available then
+    if ZLM.MailWorker == ZLM.MailWorkerStates.Available and ZLM.db.global.Characters[ZLM.CharacterIdentity].RecordDonations then
         ZLM.MailWorker = ZLM.MailWorkerStates.Working;
         local mailInfo = self:GetNextMailData();
         if not not mailInfo then
