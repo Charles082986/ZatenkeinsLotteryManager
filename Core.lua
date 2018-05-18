@@ -443,8 +443,8 @@ function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a
     end
 end
 
-function ZLM:LogDonation()
-    ZLM:Debug("Donation Received!",1);
+function ZLM:LogDonation(sender,itemId,qty,timestamp)
+    ZLM:Debug("Donation Received! ItemId: " .. itemId .. ", Qty: " .. qty .. "Time: " .. timestamp,1);
 end
 
 

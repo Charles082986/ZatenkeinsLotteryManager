@@ -63,6 +63,7 @@ function ZLM:GetInventorySnapshot()
 end
 
 function ZLM:CompareSnapshots(currentSnapshot,initialSnapshot)
+    ZLM:Debug("Comparing Snapshots: " .. tostring(currentSnapshot) .. " vs " .. tostring(initialSnapshot));
     local results = {};
     for k,v in pairs(currentSnapshot) do
         results[k] = v - (initialSnapshot[k] or 0);
@@ -135,10 +136,13 @@ end
 function ZLM:EndGetMailItems(sender,initialSnapshot)
     ZLM:Debug("Ending Current Mail and calculating differences...",1);
     ZLM:Debug("Sender: " .. sender .. ", InitialSnapshot: " .. tostring(initialSnapshot));
-    local mailContents = self:CompareSnapshots(self:GetInventorySnapshot(),initialSnapshot);
+    local mailContents = ZLM:CompareSnapshots(ZLM:GetInventorySnapshot(),initialSnapshot);
     for k,v in pairs(mailContents) do
-
-        if v > 0 then ZLM:LogDonation(sender,k,v,time()); end
+        if v > 0 then
+            ZLM:LogDonation(sender,k,v,time());
+        else
+            ZLM:Debug("Somehow lost items... ItemId: " ..k .. " Quantity: "..v,1);
+        end
     end
     ZLM.MailWorker = ZLM.MailWorkerStates.Available;
     if ZLM.MailState == ZLM.MailStateOptions.Open then ZLM:BeginGetMailItems(); end
