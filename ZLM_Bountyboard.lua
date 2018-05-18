@@ -22,7 +22,13 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
         Points = { Type = ZLM_Table.Types.Input, Width = 0.2 },
         HotItem = { Type = ZLM_Table.Types.Toggle, Width = 0.1 },
         Delete = { Type = ZLM_Table.Types.Button, Width = 0.15 },
-    },{"ItemId","Name","Need","OnHand","Points","HotItem","Delete"},AceGUI);
+    },{"ItemId"
+        ,"Name"
+        --,"Need"
+        --,"OnHand"
+        ,"Points"
+        ,"HotItem"
+        ,"Delete"},AceGUI);
     function topContainer:AddRow(dataObj,AceGUI)
         -- dataObj structure: { ItemId = number, ItemLink = string, Points = number, HotItem = bool }
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
