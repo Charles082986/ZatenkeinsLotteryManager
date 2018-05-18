@@ -439,7 +439,7 @@ function ZLM:ShowBountyboard()
         ZLM:Debug("Showing Bountyboard",1);
         local bountyBoard = ZLM_Bountyboard:new("Zatenkein's Lottery Manager - Bountyboard", {
                 AddBounty = function()
-                    ZLM.bountyboard.Table:AddRow({ ItemId = nil, ItemLink = "", Points = 0, HotItem = false})
+                    ZLM.bountyboard:AddRow({ ItemId = nil, ItemLink = "", Points = 0, HotItem = false})
                 end
             }
         );
