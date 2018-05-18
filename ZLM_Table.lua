@@ -41,6 +41,7 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
         rowGroup:SetLayout("Flow");
         for _,v in ipairs(orderArray) do
             local type = structureArray[v].Type;
+
             local data = dataObj[v];
             local item = {};
             local width = structureArray[v].Width;
@@ -57,6 +58,7 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
             elseif type == ZLM_Table.Types.Toggle then
                 item = ZLM_Checkbox:new(width,data.OnValueChanged,AceGUI,data.State);
             end
+            ZLM:Debug("Table - Adding Row Field - Type: " .. tostring(type) .. " Name: " .. tostring(v) .. " Table: " .. tostring(item),1);
             rowGroup[v] = item;
             rowGroup:AddChild(item);
             --self.RowContainer:AddChild(item)
