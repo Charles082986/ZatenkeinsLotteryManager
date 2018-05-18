@@ -73,7 +73,7 @@ function ZLM:CompareSnapshots(currentSnapshot,initialSnapshot)
         results[k] = v - (initialSnapshot[k] or 0);
     end
     for k,v in pairs(initialSnapshot) do
-        if not not currentSnapshot[k] then results[k] = 0 - v; end
+        if not currentSnapshot[k] then results[k] = 0 - v; end
     end
     return results;
 end
