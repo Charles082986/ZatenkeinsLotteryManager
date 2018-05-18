@@ -73,7 +73,7 @@ function ZLM:CompareSnapshots(currentSnapshot,initialSnapshot)
         results[k] = v - (initialSnapshot[k] or 0);
     end
     for k,v in pairs(initialSnapshot) do
-        if not currentSnapshot[k] then results[k] = 0 - v; end
+        if not currentSnapshot[k] and v > 0 then results[k] = 0 - v; end
     end
     return results;
 end
@@ -144,7 +144,7 @@ function ZLM:EndGetMailItems(sender,initialSnapshot)
     for k,v in pairs(mailContents) do
         if v > 0 then
             ZLM:LogDonation(sender,k,v,time());
-        else
+        elseif v < 0 then
             ZLM:Debug("Somehow lost items... ItemId: " ..k .. " Quantity: "..v,1);
         end
     end
