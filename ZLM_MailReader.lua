@@ -116,7 +116,7 @@ ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,sender,snapshot)
     local _, _, newSender , _, _, _, _, itemCount, _, _, _, _, _ = GetInboxHeaderInfo(innerMailIndex2);
     if not not itemCount and itemCount > 0 and not not newSender and newSender == sender then
         --ZLM:Debug("Attempting to restart semaphore...",1)
-        ZLM:EmptyLetterContents(innerMailIndex2,snapshot,sender);
+        ZLM:EmptyLetterContents(innerMailIndex2,sender,snapshot);
     else
         ZLM:EndGetMailItems(sender,snapshot);
     end
