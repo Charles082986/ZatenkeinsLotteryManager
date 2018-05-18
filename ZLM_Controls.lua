@@ -75,6 +75,7 @@ function ZLM_EditBox:new(width,callback,AceGUI,defaultValue)
     input:SetRelativeWidth(width);
     input:SetText(defaultValue);
     input:SetCallback("OnEnterPressed",callback);
+    return input;
 end
 ZLM_Controls["EditBox"] = ZLM_EditBox;
 
@@ -87,6 +88,7 @@ function ZLM_Dropdown:new(width,values,valuesOrder,callback,AceGUI,defaultValue)
     dropdown:SetRelativeWidth(width);
     dropdown:SetValue(defaultValue);
     dropdown:SetCallback("OnValueChanged",callback);
+    return dropdown;
 end
 ZLM_Controls["Dropdown"] = ZLM_Dropdown;
 
