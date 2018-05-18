@@ -110,14 +110,21 @@ ZLM_SemaphoreCallback_EmptyLetterContents = function(self,innerMailIndex,snapsho
     ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents,innerMailIndex,snapshot)
 end
 
+ZLM_AsyncValuePlaceholder_MailHeaderInfo = {};
+
 ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,snapshot)
+    local _;
     ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2) .. " Snapshot: " .. tostring(snapshot), 1);
-    local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
-    textCreated, canReply, isGM = GetInboxHeaderInfo(innerMailIndex2);
-    ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents_PostHeaderInfo,hasItem,innerMailIndex2,sender,snapshot);
+    _, _, ZLM_AsyncValuePlaceholder_MailHeaderInfo.Sender , _, _, _, _, ZLM_AsyncValuePlaceholder_MailHeaderInfo.HasItem, _, _, _, _, _ = GetInboxHeaderInfo(innerMailIndex2);
+    ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents_PostHeaderInfo,innerMailIndex2,snapshot);
 end
 
-ZLM_WaitFunction_EmptyLetterContents_PostHeaderInfo = function(hasItem,innerMailIndex2,sender,snapshot)
+ZLM_WaitFunction_EmptyLetterContents_PostHeaderInfo = function(innerMailIndex2,snapshot)
+    local hasItem = ZLM_AsyncValuePlaceholder_MailHeaderInfo.HasItem;
+    local sender = ZLM_AsyncValuePlaceholder_MailHeaderInfo.Sender;
+    ZLM:Debug("PostHeaderInfo - hasItem: " .. tostring(hasItem) .. " sender: " .. tostring(hasItem));
+    ZLM_AsyncValuePlaceholder_MailHeaderInfo = {};
+    ZLM:Debug("PostHeaderInfo - 2 - hasItem: " .. tostring(hasItem) .. " sender: " .. tostring(hasItem));
     if hasItem and hasItem > 0 and ZLM.MailState == ZLM.MailStateOptions.Open then
         --ZLM:Debug("Attempting to restart semaphore...",1)
         ZLM:EmptyLetterContents(innerMailIndex2,snapshot);
