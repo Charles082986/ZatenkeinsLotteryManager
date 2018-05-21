@@ -27,8 +27,8 @@ function ZLM_Scoreboard:new(title,callbacks,defaultValues,AceGUI)
     datepickerContainer:SetRelativeWidth(0.65);
     --END: Creating the datepicker container.
     --BEGIN: Creating Datepickers
-    local startDateDatePicker = ZLM_DatePicker:new("Start Date","ScoreboardStartDateTime",2018,date("%Y"),true,callbacks.DateChanged,defaultValues.StartDate,AceGUI);
-    local endDateDatePicker = ZLM_DatePicker:new("End Date","ScoreboardEndDateTime",2018,date("%Y"),true,callbacks.DateChanged,defaultValues.EndDate,AceGUI);
+    local startDateDatePicker = ZLM_DatePicker:new(0.5,"Start Date","ScoreboardStartDateTime",2018,date("%Y"),true,callbacks.DateChanged,defaultValues.StartDate,AceGUI);
+    local endDateDatePicker = ZLM_DatePicker:new(0.5,"End Date","ScoreboardEndDateTime",2018,date("%Y"),true,callbacks.DateChanged,defaultValues.EndDate,AceGUI);
     --END: Creating Datepickers
     --BEGIN: Creating Table
     topContainer.Table = ZLM_Table:new({
