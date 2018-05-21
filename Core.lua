@@ -156,6 +156,14 @@ ZLM_OptionsTable = {
                 ZLM:ShowBountyboard();
                 ZLM:Debug("Showing Bountyboard",1)
             end
+        },
+        ledger = {
+            name = "Donation Ledger",
+            type = "execute",
+            func = function()
+                ZLM:ShowLedger();
+                ZLM:Debug("Showing Ledger");
+            end
         }
     }
 };
@@ -446,8 +454,23 @@ function ZLM:ShowBountyboard()
                 end
             }
         );
-    ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
+        ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
         ZLM.bountyboard = bountyBoard;
+    end
+end
+function ZLM:ShowLedger()
+    if not not ZLM.ledger then
+        if ZLM.FrameState.Ledger == ZLM_FrameStateOptions.Hidden then
+            ZLM.ledger:Show();
+            ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Shown;
+        else
+            ZLM.ledger:Hide();
+            ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Hidden;
+        end
+    else
+        local ledger = ZLM_DonationLedger:new("Zatenkein's Lottery Manager - Donation Ledger");
+        ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Shown;
+        ZLM.ledger = ledger;
     end
 end
 function ZLM:GetDonationsWithinTimeframe()
@@ -463,16 +486,22 @@ function ZLM:GetDonationsWithinTimeframe()
     return output;
 end
 function ZLM:LogDonation(nameRealmCombo,itemId,quantity) -- Add a new record to the donation log.
+    local donationIndex = 0;
+    for _,v in ipairs(ZLM.db.global.Donations) do
+        if tonumber(v.Index) > donationIndex then donationIndex = tonumber(v.Index) + 1; end
+    end
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
     itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID,
     isCraftingReagent = GetItemInfo(itemId);
-    tinsert(ZLM.db.global.Donations,{ Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, ItemLink = itemLink, timestamp = date("*t")});
+    local newItem = {Index = donationIndex, Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, timestamp = date("*t")};
+    tinsert(ZLM.db.global.Donations,newItem);
+    if ZLM.ledger then ZLM.ledger:AddRow(newItem); end
 end
 function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a specific time.
     local purgeTime = time(dateObj);
     for i = #(self.db.global.Donations),1,-1 do
         local entry = self.db.global.Donations[i];
-        if entry.Timestamp < purgeTime then
+        if time(entry.Timestamp) < purgeTime then
             tremove(self.db.global.Donations,i);
         end
     end

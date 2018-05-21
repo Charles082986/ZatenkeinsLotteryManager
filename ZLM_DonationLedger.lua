@@ -1,5 +1,5 @@
 ZLM_DonationLedger = { StructureArray = {
-    Id = { Type = ZLM_Table.Types.Label, Width = 0.05 },
+    Index = { Type = ZLM_Table.Types.Label, Width = 0.05 },
     Name = { Type = ZLM_Table.Types.Input, Width = 0.15 },
     ItemId = { Type = ZLM_Table.Types.Input, Width = 0.1 },
     ItemName = { Type = ZLM_Table.Types.InteractiveLabel, Width = 0.15 },
@@ -7,7 +7,7 @@ ZLM_DonationLedger = { StructureArray = {
     Timestamp = { Type = ZLM_Table.Types.DatePicker, Width = 0.4 },
     Delete = { Type = ZLM_Table.Types.Button, Width = 0.1 }
 }};
-function ZLM_DonationLedger:new(title,callbacks,AceGUI)
+function ZLM_DonationLedger:new(title,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     local topContainer = AceGUI:Create("Frame");
     topContainer:SetLayout("Flow");
@@ -18,7 +18,8 @@ function ZLM_DonationLedger:new(title,callbacks,AceGUI)
     function topContainer:Terminate()
         ZLM.FrameState.DonationLedger = ZLM_FrameStateOptions.Hidden;
     end
-    topContainer.Table = ZLM_Table:new(self.StructureArray,{"Name"
+    topContainer.Table = ZLM_Table:new(self.StructureArray,{"Index"
+        ,"Name"
         ,"ItemId"
         ,"ItemName"
         ,"Quantity"
@@ -32,6 +33,7 @@ function ZLM_DonationLedger:new(title,callbacks,AceGUI)
             ZLM:Debug(tostring(k) .. ": " .. tostring(v));
         end
         local rowObj = {};
+        rowObj.Index = { Content = dataObj.Index };
         rowObj.Name = { Value = dataObj.Name, OnEnterPressed = ZLM_DonationLedger_NameChangeCallback };
         rowObj.ItemId = { Value = dataObj.ItemId, OnEnterPressed = ZLM_DonationLedger_ItemIdChangeCallback };
         rowObj.ItemName = { Content = dataObj.ItemName, OnClick = function() end, OnEnter = ZLM_DonationLedger_MakeTooltip, OnLeave = ZLM.ClearTooltip };
@@ -40,7 +42,26 @@ function ZLM_DonationLedger:new(title,callbacks,AceGUI)
         rowObj.Delete = { Content = "Delete", OnClick = ZLM_DonationLedger_DeleteCallback };
         self.Table.DataFrame:AddRow(rowObj,AceGUI);
     end
+    local buttonContainer = AceGUI:Create("SimpleGroup");
+    buttonContainer:SetRelativeWidth(1);
+    buttonContainer:SetLayout("Flow");
+    buttonContainer:AddChild(ZLM_Button:new("Create New Donation",ZLM_DonationLedger_CreateNewDonationCallback,0.5,AceGUI));
+    topContainer:AddChild(buttonContainer);
+    topContainer:AddChild(topContainer.Table.MainFrame);
+    for _,v in ipairs(ZLM.db.global.Donations) do
+        topContainer:AddRow(v,AceGUI)
+    end
+    return topContainer;
+end
 
+function ZLM_DonationLedger_CreateNewDonationCallback(me)
+    local donationIndex = 0;
+    for _,v in ipairs(ZLM.db.global.Donations) do
+        if tonumber(v.Index) > donationIndex then donationIndex = tonumber(v.Index) + 1; end
+    end
+    local newItem = { Index = donationIndex, Name = "PlayerName-PlayerRealm", ItemId = 45978, ItemName = "\124cff9d9d9d\124Hitem:45978::::::::110:::::\124h[Solid Gold Coin]\124h\124r", Quantity = 0, Timestamp = date("*t") };
+    ZLM.ledger:AddRow(newItem)
+    tinsert(ZLM.db.global.Donations,newItem);
 end
 
 function ZLM_DonationLedger_NameChangeCallback(me,_,text)
