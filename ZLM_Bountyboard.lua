@@ -1,11 +1,11 @@
 ZLM_Bountyboard = {};
 ZLM_Bountyboard.StructureArray = {
-    ItemId = { Type = ZLM_Table.Types.Input, Width = 0.2 },
+    ItemId = { Type = ZLM_Table.Types.Input, Width = 0.05 },
     Name = { Type = ZLM_Table.Types.InteractiveLabel, Width = 0.35 },
     --Need = { Type = ZLM_Table.Types.Input, Width = 0.1 },
     --OnHand = { Type = ZLM_Table.Types.Input, Width = 0.1 },
-    Points = { Type = ZLM_Table.Types.Input, Width = 0.2 },
-    HotItem = { Type = ZLM_Table.Types.Toggle, Width = 0.1 },
+    Points = { Type = ZLM_Table.Types.Input, Width = 0.1 },
+    HotItem = { Type = ZLM_Table.Types.Toggle, Width = 0.05 },
     Delete = { Type = ZLM_Table.Types.Button, Width = 0.15 },
 };
 function ZLM_Bountyboard:new(title,callbacks,AceGUI)
