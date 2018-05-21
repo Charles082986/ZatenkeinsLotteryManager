@@ -160,8 +160,9 @@ ZLM_OptionsTable = {
     }
 };
 function ZLM:Debug(message,severity)
+    --print(tostring(ZLM.db.profile.PrintLevel).." - " ..tostring(severity) .. " - " .. message);
     severity = severity or 1;
-    if (ZLM.db.profile.PrintLevel or 3) < severity then
+    if (ZLM.db.profile.Settings.PrintLevel or 3) < severity then
         self:Print(message);
     end
 end
@@ -475,7 +476,16 @@ function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a
     end
 end
 
+function ZLM:MakeTooltip(itemLink)
+    ZLM:Debug("Setting Tooltip - " .. itemLink);
+    GameTooltip:SetOwner(self,"ANCHOR_CURSOR");
+    GameTooltip:SetHyperlink(itemLink);
+    GameTolltip:Show();
+end
 
+function ZLM:ClearTooltip()
+    GameTooltip:Hide();
+end
 ZLM_Donation = {
     Name = "Defaultname-Default Realm",
     ItemId = 12345,

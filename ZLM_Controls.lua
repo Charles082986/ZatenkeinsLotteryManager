@@ -54,7 +54,7 @@ ZLM_Controls["Button"] = ZLM_Button;
 ZLM_Range = {};
 function ZLM_Range:new(label,min,max,step,width,callback,AceGUI,defaultValue)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
-    if not not defaultValue then defaultValue = math.floor(((min + max) / 2) / step) * step; end
+    if not defaultValue then defaultValue = math.floor(((min + max) / 2) / step) * step; end
     local range = AceGUI:Create("Slider");
     if not not label then
         range:SetLabel(label);
@@ -70,19 +70,21 @@ ZLM_Controls["Range"] = ZLM_Range;
 ZLM_EditBox = {};
 function ZLM_EditBox:new(width,callback,AceGUI,defaultValue)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
-    if not not defaultValue then defaultValue = ""; end
+    if not defaultValue then defaultValue = ""; end
+    ZLM:Debug("Creating Edit Box - " .. tostring(callback))
     local input = AceGUI:Create("EditBox");
     input:SetRelativeWidth(width);
     input:SetText(defaultValue);
     input:SetCallback("OnEnterPressed",callback);
     return input;
+
 end
 ZLM_Controls["EditBox"] = ZLM_EditBox;
 
 ZLM_Dropdown = {};
 function ZLM_Dropdown:new(width,values,valuesOrder,callback,AceGUI,defaultValue)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
-    if not not defaultValue then defaultValue = valuesOrder[1]; end
+    if not defaultValue then defaultValue = valuesOrder[1]; end
     local dropdown = AceGUI:Create("Dropdown");
     dropdown:SetList(values,valuesOrder);
     dropdown:SetRelativeWidth(width);
@@ -93,13 +95,15 @@ end
 ZLM_Controls["Dropdown"] = ZLM_Dropdown;
 
 ZLM_Checkbox = {};
-function ZLM_Checkbox:new(width,callback,AceGUI,defaultValue)
+function ZLM_Checkbox:new(width,callback,AceGUI,defaultValue,label)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
-    if not not defaultValue then defaultValue = false; end
+    if not defaultValue then defaultValue = false; end
+    if not label then label = ""; end
     local toggle = AceGUI:Create("CheckBox");
     toggle:SetRelativeWidth(width);
     toggle:SetValue(defaultValue);
     toggle:SetCallback("OnValueChanged",callback);
+    toggle:SetLabel(label);
     return toggle;
 end
 ZLM_Controls["Checkbox"] = ZLM_Checkbox;
