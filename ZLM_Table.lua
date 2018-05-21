@@ -39,6 +39,7 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
         local rowGroup = AceGUI:Create("SimpleGroup");
         rowGroup:SetFullWidth(true);
         rowGroup:SetLayout("Flow");
+        local currentYear = date("*t").year;
         for _,v in ipairs(orderArray) do
             local type = structureArray[v].Type;
             local data = dataObj[v];
@@ -56,6 +57,8 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
                 item = ZLM_Dropdown:new(width,data.List,data.ListOrder,data.OnValueChanged, AceGUI, data.Value);
             elseif type == ZLM_Table.Types.Toggle then
                 item = ZLM_Checkbox:new(width,data.OnValueChanged,AceGUI,data.State);
+            elseif type == ZLM.Table.Types.DatePicker then
+                item = ZLM_DatePicker:new(width,nil,nil,2018,currentYear,data.OnValueChangeCallback,true,data.Value,AceGUI,true);
             end
             ZLM:Debug("Table - Adding Row Field - Type: " .. tostring(type) .. " Name: " .. tostring(v) .. " Table: " .. tostring(item),1);
             rowGroup[v] = item;

@@ -1,13 +1,14 @@
 ZLM_DatePicker = {};
-function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueChangedCallback,defaultValue,AceGUI)
+function ZLM_DatePicker:new(width,name,controlKey,minYear,maxYear,includeTime,onValueChangedCallback,defaultValue,AceGUI,multiline)
+    multiline = multiline or false;
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     --BEGIN: Create Parent Frame
     local frame = AceGUI:Create("SimpleGroup");
     local dateFrame = AceGUI:Create("SimpleGroup");
-    dateFrame:SetRelativeWidth(0.5);
+    if multiline then dateFrame:SetRelativeWidth(1); else dateFrame:SetRelativeWidth(0.5); end
     dateFrame:SetLayout("Flow");
     frame:SetLayout("Flow");
-    frame:SetFullWidth(1);
+    frame:SetFullWidth(width);
     --END: Create Parent Frame
     --BEGIN: Create Dropdowns
     local years = {};
@@ -89,7 +90,7 @@ function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueC
     end
     if not not includeTime then
         local timeFrame = AceGUI:Create("SimpleGroup");
-        timeFrame:SetRelativeWidth(0.5);
+        if multiline then timeFrame:SetRelativeWidth(1); else timeFrame:SetRelativeWidth(0.5); end
         timeFrame:SetLayout("Flow");
         --BEGIN: CREATE TIME DROPDOWNS
         local hours = {};
@@ -145,3 +146,5 @@ function ZLM_DatePicker:CreateDropDown(values,order,width,controlKey,callbackKey
     end);
     return datepicker;
 end
+ZLM_Controls["DatePicker"] = ZLM_DatePicker;
+ZLM_Table.Table.Types.DatePicker = "DatePicker";
