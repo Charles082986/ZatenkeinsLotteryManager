@@ -41,7 +41,6 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
         rowGroup:SetLayout("Flow");
         for _,v in ipairs(orderArray) do
             local type = structureArray[v].Type;
-
             local data = dataObj[v];
             local item = {};
             local width = structureArray[v].Width;

@@ -140,8 +140,8 @@ function ZLM_DatePicker:CreateDropDown(values,order,width,controlKey,callbackKey
         datepicker:SetValue(defaultValue);
     end
     datepicker:SetRelativeWidth(width);
-    datepicker:SetCallback("OnValueChanged",function(_,_,key,_)
-        callback(controlKey,callbackKey,key);
+    datepicker:SetCallback("OnValueChanged",function(me,_,key,_)
+        callback(controlKey,callbackKey,key,me);
     end);
     return datepicker;
 end

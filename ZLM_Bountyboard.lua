@@ -14,14 +14,10 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
     topContainer:SetLayout("Flow");
     topContainer:SetTitle(title);
     topContainer:SetCallback("OnClose",function(widget)
-        ZLM.bountyboard = nil;
-        widget:ReleaseChildren();
-        AceGUI:Release(widget);
+        ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Hidden;
     end);
     function topContainer:Terminate()
-        ZLM.bountyboard = nil;
-        self:ReleaseChildren();
-        self:Release();
+        ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Hidden;
     end
     topContainer.Table = ZLM_Table:new(self.StructureArray,{"ItemId"
         ,"Name"
@@ -34,14 +30,19 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
         ZLM:Debug("Adding Row - " .. tostring(dataObj.ItemId));
         -- dataObj structure: { ItemId = number, ItemLink = string, Points = number, HotItem = bool }
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+        ZLM:Debug("Adding Row to Bountyboard:");
+        for k,v in pairs(dataObj) do
+            ZLM:Debug(tostring(k) .. ": " .. tostring(v));
+        end
         local rowObj = {};
         rowObj.ItemId = {
             Value = dataObj.ItemId
             , OnEnterPressed = ZLM_Bountyboard_ItemIdChangeCallback
         };
-        rowObj.Name = { Value = dataObj.Name, OnEnter = ZLM_BountyBoard_MakeTooltip, OnLeave = ZLM.ClearTooltip };
+
+        rowObj.Name = { Content = dataObj.Name, OnClick = function() end, OnEnter = ZLM_BountyBoard_MakeTooltip, OnLeave = ZLM.ClearTooltip };
         rowObj.Points = { Value = dataObj.Points,
-            OnEnterPressed = ZLM_Bountyboard_PointsChangedCallback
+            OnEnterPressed = ZLM_Bountyboard_PointsChangeCallback
         };
         rowObj.HotItem = {
             State = dataObj.HotItem,
@@ -78,10 +79,10 @@ function ZLM_Bountyboard_ItemIdChangeCallback(me,_,text)
     end
 end
 function ZLM_Bountyboard_WaitFunction_ItemIdChangeCallback(text,itemLink,me)
-    ZLM:Debug("ItemId Changed - Wait Function - " .. text .. " - " .. itemLink);
+    ZLM:Debug("ItemId Changed - Wait Function - " .. tostring(text) .. " - " .. tostring(itemLink));
     local index = -1;
     for i,v in ipairs(ZLM.db.profile.Bounties) do
-        if v.ItemId == text then index = i; break; end
+        if tostring(v.ItemId) == text then index = i; break; end
     end
     if index < 1 then
         index = #(ZLM.db.profile.Bounties) + 1;
@@ -92,7 +93,7 @@ function ZLM_Bountyboard_WaitFunction_ItemIdChangeCallback(text,itemLink,me)
     ZLM.db.profile.Bounties[index].Name = itemLink;
     ZLM.db.profile.Bounties[index].Points = me.parent.children[3]:GetText();
     ZLM.db.profile.Bounties[index].HotItem = me.parent.children[4]:GetValue();
-    ZLM:Debug("ItemId Changed - Wait Function - " .. ZLM.db.profile.Bounties[index].ItemLink);
+    ZLM:Debug("ItemId Changed - Wait Function - " .. tostring(ZLM.db.profile.Bounties[index].Name));
     me.parent.children[2]:SetText(itemLink);
 end
 function ZLM_Bountyboard_MakeTooltip(me,_,itemLink)
@@ -104,18 +105,21 @@ function ZLM_Bountyboard_MakeTooltip(me,_,itemLink)
 end
 function ZLM_Bountyboard_PointsChangeCallback(me,_,text)
     local itemId = me.parent.children[1]:GetText();
+    ZLM:Debug("Updating Points Value - Value: " .. tostring(text) .. ", ItemId: " .. tostring(itemId));
     if not not itemId and not not text then
         text = tonumber(text);
         for i,v in ipairs(ZLM.db.profile.Bounties) do
-            if v.ItemId == itemId then ZLM.db.profile.Bounties[i].Points = text; break; end
+            ZLM:Debug("Checking bounty " .. tostring(v.ItemId));
+            if tostring(v.ItemId) == itemId then v.Points = text; break; end
         end
     end
 end
 function ZLM_Bountyboard_HotItemChangeCallback(me,_,value)
-    local itemId = me.parent.children[1].GetText();
+    local itemId = me.parent.children[1]:GetText();
     if not not itemId then
         for i,v in ipairs(ZLM.db.profile.Bounties) do
-            if v.itemId == itemId then ZLM.db.profile.Bounties[i].HotItem = value; break; end
+            ZLM:Debug("Checking bounty " .. tostring(v.ItemId));
+            if tostring(v.ItemId) == itemId then v.HotItem = value; break; end
         end
     end
 end

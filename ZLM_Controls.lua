@@ -24,6 +24,7 @@ ZLM_InteractiveLabel = {};
 function ZLM_InteractiveLabel:new(text,width,onClick,onEnter,onLeave,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     local label = AceGUI:Create("InteractiveLabel");
+    ZLM:Debug("Interactive Label Text - " .. tostring(text));
     label:SetText(text);
     label:SetRelativeWidth(width);
     if not not onClick then
