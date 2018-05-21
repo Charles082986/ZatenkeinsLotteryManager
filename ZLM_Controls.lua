@@ -27,13 +27,13 @@ function ZLM_InteractiveLabel:new(text,width,onClick,onEnter,onLeave,AceGUI)
     label:SetText(text);
     label:SetRelativeWidth(width);
     if not not onClick then
-        label:SetCallback("OnClick",onClick);
+        label:SetCallback("OnClick",onClick or function() end);
     end
     if not not onEnter then
-        label:SetCallback("OnEnter",onEnter);
+        label:SetCallback("OnEnter",onEnter or function() end);
     end
     if not not onLeave then
-        label:SetCallback("OnLeave",onLeave);
+        label:SetCallback("OnLeave",onLeave or function() end);
     end
     return label;
 end

@@ -39,7 +39,7 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
             Value = dataObj.ItemId
             , OnEnterPressed = ZLM_Bountyboard_ItemIdChangeCallback
         };
-        rowObj.Name = { Value = dataObj.ItemLink, OnEnter = ZLM_BountyBoard_MakeTooltip, OnLeave = ZLM.ClearTooltip };
+        rowObj.Name = { Value = dataObj.Name, OnEnter = ZLM_BountyBoard_MakeTooltip, OnLeave = ZLM.ClearTooltip };
         rowObj.Points = { Value = dataObj.Points,
             OnEnterPressed = ZLM_Bountyboard_PointsChangedCallback
         };
