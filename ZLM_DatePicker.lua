@@ -8,7 +8,7 @@ function ZLM_DatePicker:new(width,name,controlKey,minYear,maxYear,includeTime,on
     if multiline then dateFrame:SetRelativeWidth(1); else dateFrame:SetRelativeWidth(0.5); end
     dateFrame:SetLayout("Flow");
     frame:SetLayout("Flow");
-    frame:SetFullWidth(width);
+    frame:SetRelativeWidth(width);
     --END: Create Parent Frame
     --BEGIN: Create Dropdowns
     local years = {};

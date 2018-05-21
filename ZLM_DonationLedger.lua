@@ -89,8 +89,8 @@ function ZLM_DonationLedger_WaitFunction_ItemIdChangeCallback(text,itemLink,me)
     me.parent.children[3]:SetText(itemLink);
 end
 function ZLM_DonationLedger_MakeTooltip(me)
-    local link = me:GetText();
-    ZLM:MakeTooltip(link);
+    --local link = ;
+    --ZLM:MakeTooltip(link);
 end
 function ZLM_DonationLedger_QuantityChangeCallback(me,_,text)
     local index = me.parent.children[1]:GetText();
