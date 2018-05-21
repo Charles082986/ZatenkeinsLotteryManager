@@ -214,7 +214,8 @@ function ZLM:OnInitialize()
     if not self.db.profile.Bounties then self.db.profile.Bounties = {}; end
     if not self.db.global.Characters then self.db.global.Characters = {}; end
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
-    self.FrameStates = {};
+    self.FrameState = { Scoreboard = ZLM_FrameStateOptions.Hidden, Bountyboard = ZLM_FrameStateOptions.Hidden };
+
     ZLM:Debug("ZLM instantiated.",1);
 end
 
@@ -445,6 +446,7 @@ function ZLM:ShowBountyboard()
                 end
             }
         );
+    ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
         ZLM.bountyboard = bountyBoard;
     end
 end

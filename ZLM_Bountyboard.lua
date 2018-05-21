@@ -1,12 +1,12 @@
 ZLM_Bountyboard = {};
 ZLM_Bountyboard.StructureArray = {
-    ItemId = { Type = ZLM_Table.Types.Input, Width = 0.05 },
+    ItemId = { Type = ZLM_Table.Types.Input, Width = 0.1 },
     Name = { Type = ZLM_Table.Types.InteractiveLabel, Width = 0.35 },
     --Need = { Type = ZLM_Table.Types.Input, Width = 0.1 },
     --OnHand = { Type = ZLM_Table.Types.Input, Width = 0.1 },
     Points = { Type = ZLM_Table.Types.Input, Width = 0.1 },
-    HotItem = { Type = ZLM_Table.Types.Toggle, Width = 0.05 },
-    Delete = { Type = ZLM_Table.Types.Button, Width = 0.15 },
+    HotItem = { Type = ZLM_Table.Types.Toggle, Width = 0.1 },
+    Delete = { Type = ZLM_Table.Types.Button, Width = 0.25 },
 };
 function ZLM_Bountyboard:new(title,callbacks,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
@@ -48,7 +48,7 @@ function ZLM_Bountyboard:new(title,callbacks,AceGUI)
             OnValueChanged = ZLM_Bountyboard_HotItemChangeCallback
         };
         rowObj.Delete = {
-            Content = "Delete",
+            Content = "Delete Bounty",
             OnClick = ZLM_Bountyboard_DeleteCallback
         };
         self.Table.DataFrame:AddRow(rowObj,AceGUI);
@@ -120,18 +120,27 @@ function ZLM_Bountyboard_HotItemChangeCallback(me,_,value)
     end
 end
 function ZLM_Bountyboard_DeleteCallback(me)
-    local itemId = me.parent.children[1].GetText();
+    local itemId = me.parent.children[1]:GetText();
+    ZLM:Debug("Removing Item - " .. itemId);
     if not not itemId then
-        for i,v in ipairs(ZLM.db.profile.Bounties) do
-            if v.itemId == itemId then
+        ZLM:Debug("There are currently " .. tostring(#(ZLM.db.profile.Bounties)) .. " bounties.");
+        for i = #(ZLM.db.profile.Bounties),1,-1 do
+            ZLM:Debug("Checking deleteId " .. itemId .. " against Bounty " .. i .. " with id " .. ZLM.db.profile.Bounties[i].ItemId .. " : " .. tostring(ZLM.db.profile.Bounties[i].ItemId == itemId));
+            if tostring(ZLM.db.profile.Bounties[i].ItemId) == itemId then
+                ZLM:Debug("Removing index " .. tostring(i) .. " from bounties.");
                 tremove(ZLM.db.profile.Bounties,i);
                 break;
             end
         end
-        for i,v in ipairs(me.parent.parent.children) do
-            if v.children[1]:GetText() == itemId then
+        ZLM:Debug("There are currently " .. tostring(#(me.parent.parent.children)) .. " records.");
+        for i = #(me.parent.parent.children),1,-1 do
+            ZLM:Debug("Checkting deleteId " .. itemId .. " against " .. me.parent.parent.children[i].children[1]:GetText())
+            if me.parent.parent.children[i].children[1]:GetText() == itemId then
+                ZLM:Debug("Removing index " .. tostring(i) .. " from UI.");
+                me.parent.parent.children[i]:Release();
                 tremove(me.parent.parent.children,i);
             end
         end
     end
+    me.parent.parent:DoLayout();
 end
