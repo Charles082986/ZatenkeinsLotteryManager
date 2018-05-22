@@ -2,6 +2,13 @@
 <project version="4">
   <component name="PublishConfigData" serverName="Zatenkein's WoW Path">
     <serverData>
+      <paths name="Sinderion's WoW Path">
+        <serverdata>
+          <mappings>
+            <mapping deploy="\ZatenkeinsLotteryManager\" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="Zatenkein's WoW Path">
         <serverdata>
           <mappings>
