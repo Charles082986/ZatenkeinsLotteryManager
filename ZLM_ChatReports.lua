@@ -6,6 +6,7 @@ local words = {
     "^lottery"
 
 };
+
 local ZLMPrefixPattern = "%[ZLM\]";
 local ZLMPrefix = "[ZLM]";
 local caseInsensitiveWords = {};
@@ -25,6 +26,22 @@ function ZLM:PlayerName()
     --Remove Spaces
     --player = string.gsub(player,"%s", "")
     return player;
+end
+function ZLM_CreateChatReportTestData(key)
+    if key ~= #ZLM_ScoreboardData then return; end;
+    print("Populating test data table.");
+    for i=1, 7 do
+        ZLM_ScoreboardData[i] = {}
+
+        if i == 3 then
+            ZLM_ScoreboardData[i].Name = "Zatenkein-Shadow Council";
+        elseif i == 2 then
+            ZLM_ScoreboardData[i].Name = UnitName("player").."-" .. GetRealmName();
+        else
+            ZLM_ScoreboardData[i].Name = "bob"..i;
+        end
+        ZLM_ScoreboardData[i].Points = i*50;
+    end
 end
 function ZLM:ChatReport(player,test)
     local output = {};
