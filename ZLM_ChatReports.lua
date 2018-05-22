@@ -7,7 +7,9 @@ local words = {
 
 };
 
+ZLM.GuildChatCooldown = false;
 local ZLMPrefixPattern = "%[ZLM\]";
+
 local ZLMPrefix = "[ZLM]";
 local caseInsensitiveWords = {};
 for k,v in pairs(words) do
@@ -40,11 +42,12 @@ function ZLM_CreateChatReportTestData(key)
         else
             ZLM_ScoreboardData[i].Name = "bob"..i;
         end
-        ZLM_ScoreboardData[i].Points = i*50;
+        ZLM_ScoreboardData[i].Points = 1000 - i*50;
     end
 end
-function ZLM:ChatReport(player,test)
+function ZLM:ChatReport(player,test,channel)
     local output = {};
+    channel = channel or "WHISPER"
     local prefix;
     local prefixpattern;
     if test then
@@ -54,23 +57,24 @@ function ZLM:ChatReport(player,test)
         prefixpattern = ZLMPrefixPattern;
         prefix = ZLMPrefix;
     end
-    SendChatMessage(prefix.." ZLM Standings:", "WHISPER", nil, player);
-    --Find if guy messaging is on the Scoreboard.
-    for i,v in ipairs(ZLM_ScoreboardData) do
-        if v.Name == ZLM:PlayerName() or v.Name == UnitName("player") then
-            -- Insert personalized report.
-            SendChatMessage(prefix.." Your rank: "..i, "WHISPER", nil, player);
-        end
-    end
+    SendChatMessage(prefix.." ZLM Standings:", channel, nil, player);
+
     --Reply with the whole list.
-    SendChatMessage(prefix.." Rank--Points--Name", "WHISPER", nil, player);
+    SendChatMessage(prefix.." Rank--Points--Name", channel, nil, player);
     for i,v in ipairs(ZLM_ScoreboardData) do
         local rank = i;
         local character = v.Name;
         local points = v.Points;
-        SendChatMessage(prefix..rank.." ....... "..points.." ....... "..character, "WHISPER", nil, player);
+        SendChatMessage(prefix..rank.." ....... "..points.." ....... "..character, channel, nil, player);
     end
-    SendChatMessage(prefix.."------------------", "WHISPER", nil, player);
+    SendChatMessage(prefix.."------------------", channel, nil, player);
+    --Find if guy messaging is on the Scoreboard.
+    for i,v in ipairs(ZLM_ScoreboardData) do
+        if v.Name == ZLM:PlayerName() or v.Name == UnitName("player") then
+            -- Insert personalized report.
+            SendChatMessage(prefix.." Your rank: "..i, channel, nil, player);
+        end
+    end
     print("Lottery info sent to: "..player)
 
 end
@@ -81,6 +85,19 @@ function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
                 ZLM:ChatReport(author,test);
             end
         end
+end
+function ZLM:CHAT_MSG_GUILD(event, message, author,...)
+    if ZLM.GuildChatCooldown then return; end
+
+    for k, v in pairs(caseInsensitiveWords) do
+        if not not string.match(message,v) then
+            local test = not not string.match(message,"^lottotest");
+            ZLM:ChatReport(author,test,"GUILD");
+            -- Invoke cooldown;
+            ZLM.GuildChatCooldown = true;
+            C_Timer.After(150, function() print("Guild Cooldown Reset.") ZLM.GuildChatCooldown = false; end);
+        end
+    end
 end
 function ZLM_ChatFilter(self,event,myChatMessage, author,...)
     if type(myChatMessage) == "string" then
@@ -103,7 +120,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER",ZLM_ChatFilter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM",ZLM_ChatFilter);
 ZLM:RegisterEvent("CHAT_MSG_WHISPER");
-
+ZLM:RegisterEvent("CHAT_MSG_GUILD");
 
 
 
