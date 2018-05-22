@@ -223,7 +223,7 @@ function ZLM:OnInitialize()
     if not self.db.global.Characters then self.db.global.Characters = {}; end
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
     self.FrameState = { Scoreboard = ZLM_FrameStateOptions.Hidden, Bountyboard = ZLM_FrameStateOptions.Hidden };
-
+    ZLM:UpdateScoreboard();
     ZLM:Debug("ZLM instantiated.",1);
 end
 
@@ -299,35 +299,41 @@ function ZLM:RunLottery() -- TO DO: Needs update without params.
 	end
 	ZLM:AnnounceWinners(winners,lotteryMethod);
 end
+ZLM_ScoreboardData = {};
 function ZLM:UpdateScoreboard()
 	local donations = GetDonationsWithinTimeFrame();
     local pointsTable = {};
+    local hasPoints = false;
     for _,v in ipairs(ZLM.db.profile.Bounties) do
         if v.HotItem then
             pointsTable[v.ItemId] = v.Points * 2;
         else
             pointsTable[v.ItemId] = v.Points;
         end
+        hasPoints = true;
     end
-    ZLM_ScoreboardData = {};
-    local tempPoints = {};
-    for _,v in ipairs(donations) do
-        local points = pointsTable[v.ItemId] * v.Quantity;
-        if not not tempPoints[v.Name] then tempPoints[v.Name] = tempPoints[v.Name] + points; else tempPoints[v.Name] = points; end
-    end
-    for k,v in pairs(tempPoints) do
-        tinsert(ZLM_ScoreboardData,{ Name = k, Points = v });
-    end
-    sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
-    local rangeMin = 1;
-    for i,v in ipairs(ZLM_ScoreboardData) do
-        v.Rank = i;
-        v.Min = rangeMin;
-        v.Max = rangeMin + v.Points - 1;
-        if not not ZLM.scoreboard then
-            ZLM.scoreboard.Table.DataFrame:AddRow(v);
+    if hasPoints then
+        local tempPoints = {};
+        for _,v in ipairs(donations) do
+            local points = pointsTable[v.ItemId] * v.Quantity;
+            if not not tempPoints[v.Name] then tempPoints[v.Name] = tempPoints[v.Name] + points; else tempPoints[v.Name] = points; end
         end
-        rangeMin = v.Max + 1;
+        for k,v in pairs(tempPoints) do
+            tinsert(ZLM_ScoreboardData,{ Name = k, Points = v });
+        end
+        if #(ZLM_ScoreboardData) > 0 then
+            sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
+            local rangeMin = 1;
+            for i,v in ipairs(ZLM_ScoreboardData) do
+                v.Rank = i;
+                v.Min = rangeMin;
+                v.Max = rangeMin + v.Points - 1;
+                if not not ZLM.scoreboard then
+                    ZLM.scoreboard.Table.DataFrame:AddRow(v);
+                end
+                rangeMin = v.Max + 1;
+            end
+        end
     end
 end
 function ZLM:GetRaffleWinners()
