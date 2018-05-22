@@ -1,11 +1,11 @@
 ZLM_DonationLedger = { StructureArray = {
-    Index = { Type = ZLM_Table.Types.Label, Width = 0.05 },
-    Name = { Type = ZLM_Table.Types.Input, Width = 0.15 },
-    ItemId = { Type = ZLM_Table.Types.Input, Width = 0.1 },
-    ItemName = { Type = ZLM_Table.Types.InteractiveLabel, Width = 0.15 },
+    Index = { Type = ZLM_Table.Types.Input, Width = 0.15 },
+    Name = { Type = ZLM_Table.Types.Input, Width = 0.25 },
+    ItemId = { Type = ZLM_Table.Types.Input, Width = 0.2 },
+    ItemName = { Type = ZLM_Table.Types.InteractiveLabel, Width = 0.3 },
     Quantity = { Type = ZLM_Table.Types.Input, Width = 0.1 },
-    Timestamp = { Type = ZLM_Table.Types.DatePicker, Width = 0.4 },
-    Delete = { Type = ZLM_Table.Types.Button, Width = 0.1 }
+    Timestamp = { Type = ZLM_Table.Types.DatePicker, Width = 0.75 },
+    Delete = { Type = ZLM_Table.Types.Button, Width = 0.225 }
 }};
 function ZLM_DonationLedger:new(title,AceGUI)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
@@ -33,12 +33,12 @@ function ZLM_DonationLedger:new(title,AceGUI)
             ZLM:Debug(tostring(k) .. ": " .. tostring(v));
         end
         local rowObj = {};
-        rowObj.Index = { Content = dataObj.Index };
+        rowObj.Index = { Value = dataObj.Index, OnEnterPressed = function() end, Disabled = true };
         rowObj.Name = { Value = dataObj.Name, OnEnterPressed = ZLM_DonationLedger_NameChangeCallback };
         rowObj.ItemId = { Value = dataObj.ItemId, OnEnterPressed = ZLM_DonationLedger_ItemIdChangeCallback };
         rowObj.ItemName = { Content = dataObj.ItemName, OnClick = function() end, OnEnter = ZLM_DonationLedger_MakeTooltip, OnLeave = ZLM.ClearTooltip };
         rowObj.Quantity = { Value = dataObj.Quantity, OnEnterPressed = ZLM_DonationLedger_QuantityChangeCallback };
-        rowObj.Timestamp = { Value = dataObj.Timestamp, OnValueChanged = ZLM_DonationLedger_DateChangeCallback };
+        rowObj.Timestamp = { Value = dataObj.Timestamp, OnValueChanged = ZLM_DonationLedger_DateChangeCallback, Multiline = false };
         rowObj.Delete = { Content = "Delete", OnClick = ZLM_DonationLedger_DeleteCallback };
         self.Table.DataFrame:AddRow(rowObj,AceGUI);
     end
@@ -55,9 +55,9 @@ function ZLM_DonationLedger:new(title,AceGUI)
 end
 
 function ZLM_DonationLedger_CreateNewDonationCallback(me)
-    local donationIndex = 0;
+    local donationIndex = 1;
     for _,v in ipairs(ZLM.db.global.Donations) do
-        if tonumber(v.Index) > donationIndex then donationIndex = tonumber(v.Index) + 1; end
+        if tonumber(v.Index) >= donationIndex then donationIndex = tonumber(v.Index) + 1; end
     end
     local newItem = { Index = donationIndex, Name = "PlayerName-PlayerRealm", ItemId = 45978, ItemName = "\124cff9d9d9d\124Hitem:45978::::::::110:::::\124h[Solid Gold Coin]\124h\124r", Quantity = 0, Timestamp = date("*t") };
     ZLM.ledger:AddRow(newItem)
@@ -86,7 +86,7 @@ function ZLM_DonationLedger_ItemIdChangeCallback(me,_,text)
     end
 end
 function ZLM_DonationLedger_WaitFunction_ItemIdChangeCallback(text,itemLink,me)
-    me.parent.children[3]:SetText(itemLink);
+    me.parent.children[4]:SetText(itemLink);
 end
 function ZLM_DonationLedger_MakeTooltip(me)
     --local link = ;
@@ -102,7 +102,7 @@ function ZLM_DonationLedger_QuantityChangeCallback(me,_,text)
     end
 end
 function ZLM_DonationLedger_DateChangeCallback(controlKey,callbackKey,value,me)
-    local index = me.parent.parent.children[1]:GetText();
+    local index = me.parent.parent.parent.children[1]:GetText();
     if not not index and not not value then
         for _,v in pairs(ZLM.db.global.Donations) do
             ZLM:Debug("Checking donation " .. tostring(v.Index));

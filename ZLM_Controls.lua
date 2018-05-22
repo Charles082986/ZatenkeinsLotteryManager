@@ -69,13 +69,15 @@ end
 ZLM_Controls["Range"] = ZLM_Range;
 
 ZLM_EditBox = {};
-function ZLM_EditBox:new(width,callback,AceGUI,defaultValue)
+function ZLM_EditBox:new(width,callback,AceGUI,defaultValue,disabled)
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     if not defaultValue then defaultValue = ""; end
+    if not disabled then disabled = false; end
     ZLM:Debug("Creating Edit Box - " .. tostring(callback))
     local input = AceGUI:Create("EditBox");
     input:SetRelativeWidth(width);
     input:SetText(defaultValue);
+    input:SetDisabled(disabled);
     input:SetCallback("OnEnterPressed",callback);
     return input;
 

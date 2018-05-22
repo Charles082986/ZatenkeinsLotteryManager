@@ -5,7 +5,7 @@ function ZLM_DatePicker:new(width,name,controlKey,minYear,maxYear,includeTime,on
     --BEGIN: Create Parent Frame
     local frame = AceGUI:Create("SimpleGroup");
     local dateFrame = AceGUI:Create("SimpleGroup");
-    if multiline then dateFrame:SetRelativeWidth(1); else dateFrame:SetRelativeWidth(0.5); end
+    if multiline then dateFrame:SetRelativeWidth(1); else dateFrame:SetRelativeWidth(0.49); end
     dateFrame:SetLayout("Flow");
     frame:SetLayout("Flow");
     frame:SetRelativeWidth(width);
@@ -90,7 +90,7 @@ function ZLM_DatePicker:new(width,name,controlKey,minYear,maxYear,includeTime,on
     end
     if not not includeTime then
         local timeFrame = AceGUI:Create("SimpleGroup");
-        if multiline then timeFrame:SetRelativeWidth(1); else timeFrame:SetRelativeWidth(0.5); end
+        if multiline then timeFrame:SetRelativeWidth(1); else timeFrame:SetRelativeWidth(0.49); end
         timeFrame:SetLayout("Flow");
         --BEGIN: CREATE TIME DROPDOWNS
         local hours = {};
@@ -110,7 +110,7 @@ function ZLM_DatePicker:new(width,name,controlKey,minYear,maxYear,includeTime,on
             tinsert(sixtyOrder,i);
         end
         local hoursDropdown = ZLM_DatePicker:CreateDropDown(hours,hoursOrder,baseSize,controlKey,"hour",onValueChangedCallback, defaultValue.hour);
-        local minutesDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"minute",onValueChangedCallback, defaultValue.minute);
+        local minutesDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"minute",onValueChangedCallback, defaultValue.min);
         local secondsDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"sec",onValueChangedCallback, defaultValue.sec);
         --END: CREATE TIME DROPDOWNS
         --BEGIN: ADD TIME DROPDOWNS TO PARENT

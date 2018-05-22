@@ -52,13 +52,13 @@ function ZLM_Table:new(structureArray,orderArray,AceGUI)
             elseif type == ZLM_Table.Types.Button then
                 item = ZLM_Button:new(data.Content, data.OnClick, width, AceGUI);
             elseif type == ZLM_Table.Types.Input then
-                item = ZLM_EditBox:new(width, data.OnEnterPressed, AceGUI, data.Value);
+                item = ZLM_EditBox:new(width, data.OnEnterPressed, AceGUI, data.Value, data.Disabled);
             elseif type == ZLM_Table.Types.Dropdown then
                 item = ZLM_Dropdown:new(width,data.List,data.ListOrder,data.OnValueChanged, AceGUI, data.Value);
             elseif type == ZLM_Table.Types.Toggle then
                 item = ZLM_Checkbox:new(width,data.OnValueChanged,AceGUI,data.State);
             elseif type == ZLM_Table.Types.DatePicker then
-                item = ZLM_DatePicker:new(width,nil,nil,2018,currentYear,true,data.OnValueChanged,data.Value,AceGUI,true);
+                item = ZLM_DatePicker:new(width,nil,nil,2018,currentYear,true,data.OnValueChanged,data.Value,AceGUI,data.Multiline);
                 --width,name,controlKey,minYear,maxYear,includeTime,onValueChangedCallback,defaultValue,AceGUI,multiline
             end
             ZLM:Debug("Table - Adding Row Field - Type: " .. tostring(type) .. " Name: " .. tostring(v) .. " Table: " .. tostring(item),1);
