@@ -6,7 +6,7 @@ local words = {
     "^lottery"
 
 };
-
+ZLM_MAX_REPORT_RANKS = 5;
 ZLM.GuildChatCooldown = false;
 local ZLMPrefixPattern = "%[ZLM\]";
 
@@ -16,8 +16,8 @@ for k,v in pairs(words) do
     -- replaces "words" with "[Ww][Oo][Rr][Dd][Ss]"
     caseInsensitiveWords[v],_ = string.gsub(v,"%a",function(a) return "["..a:upper()..a:lower().."]" end);
 end;
-function ZLM:PlayerName()
-    local player, _ = UnitName("player");
+function ZLM:PlayerName(player)
+
     --Try to give back Sinderion-ShadowCouncil style name every time. No spaces, full name-realm.
     --If the name is short, like Sinderion only, add realm.
     if not string.match(player,"-") then
@@ -26,7 +26,7 @@ function ZLM:PlayerName()
         --player = player .."-".. string.gsub(realm,"%s", "");
     end
     --Remove Spaces
-    --player = string.gsub(player,"%s", "")
+    player = string.gsub(player,"%s", "")
     return player;
 end
 function ZLM_CreateChatReportTestData(key)
@@ -51,26 +51,27 @@ function ZLM:ChatReport(player,test,channel)
     local prefix;
     local prefixpattern;
     if test then
-     prefixpattern = "don'tmatchme";
+        prefixpattern = "don'tmatchme";
         prefix = "[test]"
     else
         prefixpattern = ZLMPrefixPattern;
         prefix = ZLMPrefix;
     end
     SendChatMessage(prefix.." ZLM Standings:", channel, nil, player);
-
     --Reply with the whole list.
     SendChatMessage(prefix.." Rank--Points--Name", channel, nil, player);
     for i,v in ipairs(ZLM_ScoreboardData) do
+        if i > ZLM_MAX_REPORT_RANKS then break; end
         local rank = i;
         local character = v.Name;
         local points = v.Points;
-        SendChatMessage(prefix..rank.." ....... "..points.." ....... "..character, channel, nil, player);
+        SendChatMessage(prefix.." "..rank.." ....... "..points.." ....... "..character, channel, nil, player);
     end
     SendChatMessage(prefix.."------------------", channel, nil, player);
     --Find if guy messaging is on the Scoreboard.
     for i,v in ipairs(ZLM_ScoreboardData) do
-        if v.Name == ZLM:PlayerName() or v.Name == UnitName("player") then
+        print(ZLM:PlayerName(v.Name).." "..player);
+        if ZLM:PlayerName(v.Name) == player then
             -- Insert personalized report.
             SendChatMessage(prefix.." Your rank: "..i, channel, nil, player);
         end
