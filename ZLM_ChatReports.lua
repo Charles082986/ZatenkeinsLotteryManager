@@ -160,6 +160,9 @@ function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
         "^![Ll][Oo][Tt][Tt][Oo]",
         "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
     }
+    if not not string.match(message,"^%(") and not not string.match(message,"%)") then
+        message = string.gsub(message,"^(.*): ","")
+    end
         for k, v in pairs(words) do
             if not not string.match(message,v) then
                 local test = not not string.match(message,"^lottotest");
