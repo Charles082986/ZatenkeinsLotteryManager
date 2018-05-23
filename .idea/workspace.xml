@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="29cf78cd-63c7-43c9-bce4-c26705adefd4" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Core.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Core.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ZLM_ChatReports.lua" beforeDir="false" afterPath="$PROJECT_DIR$/ZLM_ChatReports.lua" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -20,8 +20,35 @@
       <file leaf-file-name="ZLM_ChatReports.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-353">
-              <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
+            <state relative-caret-position="116">
+              <caret line="47" column="21" lean-forward="true" selection-start-line="47" selection-start-column="21" selection-end-line="47" selection-end-column="21" />
+              <folding>
+                <element signature="e#14#111#1" />
+                <element signature="n#ZLM:PlayerName#0" />
+                <element signature="n#ZLM_CreateChatReportTestData#0" />
+                <element signature="n#ZLM:ChatReport#0" />
+                <element signature="n#ZLM:CHAT_MSG_WHISPER#0" />
+                <element signature="n#ZLM:CHAT_MSG_GUILD#0" />
+                <element signature="n#ZLM_ChatFilter#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ZatenkeinsLotteryManager.toc" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/ZatenkeinsLotteryManager.toc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="5" selection-start-line="5" selection-end-line="5" selection-end-column="65" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Core.lua" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core.lua">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1064">
+              <caret line="211" column="29" lean-forward="true" selection-start-line="211" selection-start-column="29" selection-end-line="211" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -38,6 +65,10 @@
       <find>Prefix</find>
       <find>hidereply</find>
       <find>PlayerName</find>
+      <find>options</find>
+      <find>zatenkeinslotterymanagerdb</find>
+      <find>zatenkein</find>
+      <find>scoreboarddata</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -46,8 +77,8 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Core.lua" />
         <option value="$PROJECT_DIR$/ZatenkeinsLotteryManager.toc" />
+        <option value="$PROJECT_DIR$/Core.lua" />
         <option value="$PROJECT_DIR$/ZLM_ChatReports.lua" />
       </list>
     </option>
@@ -61,17 +92,19 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="571" />
-    <option name="y" value="39" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-6" />
     <option name="width" value="1400" />
-    <option name="height" value="1000" />
+    <option name="height" value="1085" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="ProjectPane" />
+      <pane id="Scope" />
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="true" />
@@ -103,18 +136,20 @@
       <workItem from="1526925322405" duration="392000" />
       <workItem from="1527004068741" duration="16479000" />
       <workItem from="1527028355767" duration="930000" />
+      <workItem from="1527083761405" duration="4075000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="27142000" />
+    <option name="totallyTimeSpent" value="31217000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="2576" height="1096" extended-state="6" />
+    <frame x="-6" y="0" width="1400" height="1085" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="bottom" id="File Transfer" order="8" visible="true" weight="0.32925585" />
+      <window_info anchor="bottom" id="File Transfer" order="8" visible="true" weight="0.32886598" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Terminal" order="7" />
@@ -127,8 +162,8 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" />
@@ -141,6 +176,22 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="901">
+          <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
+          <folding>
+            <element signature="e#14#111#1" />
+            <element signature="n#ZLM:PlayerName#0" />
+            <element signature="n#ZLM_CreateChatReportTestData#0" />
+            <element signature="n#ZLM:ChatReport#0" />
+            <element signature="n#ZLM:CHAT_MSG_WHISPER#0" />
+            <element signature="n#ZLM:CHAT_MSG_GUILD#0" />
+            <element signature="n#ZLM_ChatFilter#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1088">
@@ -204,13 +255,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ZatenkeinsLotteryManager.toc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="20" selection-start-line="20" selection-end-line="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_MailReader.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
@@ -218,17 +262,33 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ZatenkeinsLotteryManager.toc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" selection-start-line="5" selection-end-line="5" selection-end-column="65" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Core.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="209" column="49" lean-forward="true" selection-start-line="209" selection-start-column="49" selection-end-line="209" selection-end-column="49" />
+        <state relative-caret-position="1064">
+          <caret line="211" column="29" lean-forward="true" selection-start-line="211" selection-start-column="29" selection-end-line="211" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-353">
-          <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
+        <state relative-caret-position="116">
+          <caret line="47" column="21" lean-forward="true" selection-start-line="47" selection-start-column="21" selection-end-line="47" selection-end-column="21" />
+          <folding>
+            <element signature="e#14#111#1" />
+            <element signature="n#ZLM:PlayerName#0" />
+            <element signature="n#ZLM_CreateChatReportTestData#0" />
+            <element signature="n#ZLM:ChatReport#0" />
+            <element signature="n#ZLM:CHAT_MSG_WHISPER#0" />
+            <element signature="n#ZLM:CHAT_MSG_GUILD#0" />
+            <element signature="n#ZLM_ChatFilter#0" />
+          </folding>
         </state>
       </provider>
     </entry>

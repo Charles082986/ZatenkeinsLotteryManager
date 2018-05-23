@@ -213,6 +213,7 @@ function ZLM:OnInitialize()
     if not self.db.profile.Settings then self.db.profile.Settings = {}; end
     if not self.db.profile.Bounties then self.db.profile.Bounties = {}; end
     if not self.db.global.Characters then self.db.global.Characters = {}; end
+    if not self.db.profile.Reporting then  self.db.profile.Reporting = {}; end
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
     self.FrameStates = {};
     ZLM:Debug("ZLM instantiated.",1);

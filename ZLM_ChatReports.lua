@@ -6,6 +6,75 @@ local words = {
     "^lottery"
 
 };
+
+-- Guild reply toggle
+-- Cooldown slider
+-- Number to report
+
+ZLM_OptionsTable.args.Reporting = {
+    name = "Reporting",
+    type = "group",
+    order = 1,
+    args = {
+
+        maxReportResults = {
+            name = "Number to show.",
+            desc = "The number of top spots on the scoreboard to reply with. Number one, to number ?",
+            type = "range",
+            min = 1,
+            max = 10,
+            step = 1,
+            bigStep = 1,
+            set = "SetMaxReportResults",
+            get = "GetMaxReportResults",
+            order = 1,
+            descStyle="inline"
+        },
+        guildReply = {
+            name = "Reply in Guild",
+            desc = "Reply to !lotto scoreboard queries in guild chat",
+            type = "toggle",
+            set = "SetGuildReply",
+            get = "GetGuildReply",
+            order = 2,
+            descStyle="inline"
+        },
+
+        guildReplyCooldown = {
+            name = "Guild Reply Cooldown (in minutes)",
+            desc = "Cooldown for Guild scoreboard spam.",
+            type = "range",
+            min = 0,
+            max = 10,
+            step = 1,
+            bigStep = 1,
+            set = "SetGuildReplyCooldown",
+            get = "SetGuildReplyCooldown",
+            order = 3,
+            descStyle="inline"
+        },
+    }
+};
+function ZLM:SetMaxReportResults(_,value)
+    self.db.profile.Reporting.maxReportResults = value;
+end
+function ZLM:GetMaxReportResults(_)
+    return self.db.profile.Reporting.maxReportResults;
+end
+function ZLM:SetGuildReply(_,value)
+    self.db.profile.Reporting.guildReply = value;
+end
+function ZLM:GetGuildReply(_)
+    return self.db.profile.Reporting.guildReply;
+end
+function ZLM:SetGuildReplyCooldown(_,value)
+    self.db.profile.Reporting.guildReplyCooldown = value;
+end
+function ZLM:GetGuildReplyCooldown(_)
+    return self.db.profile.Reporting.guildReplyCooldown;
+end
+
+
 ZLM_MAX_REPORT_RANKS = 5;
 ZLM.GuildChatCooldown = false;
 local ZLMPrefixPattern = "%[ZLM\]";
