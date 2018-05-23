@@ -1,11 +1,4 @@
-local words = {
-    -- add words to respond to
-    "^lotto",
-    "^!lotto" ,
-    "^!lottery",
-    "^lottery"
 
-};
 
 -- Guild reply toggle
 -- Cooldown slider
@@ -77,14 +70,24 @@ end
 
 ZLM_MAX_REPORT_RANKS = 5;
 ZLM.GuildChatCooldown = false;
+--[[
 local ZLMPrefixPattern = "%[ZLM\]";
 
 local ZLMPrefix = "[ZLM]";
+local words = {
+    -- add words to respond to
+    "^lotto",
+    "^!lotto" ,
+    "^!lottery",
+    "^lottery"
+
+};
 local caseInsensitiveWords = {};
 for k,v in pairs(words) do
     -- replaces "words" with "[Ww][Oo][Rr][Dd][Ss]"
     caseInsensitiveWords[v],_ = string.gsub(v,"%a",function(a) return "["..a:upper()..a:lower().."]" end);
 end;
+]]--
 function ZLM:PlayerName(player)
 
     --Try to give back Sinderion-ShadowCouncil style name every time. No spaces, full name-realm.
@@ -115,7 +118,6 @@ function ZLM_CreateChatReportTestData(key)
     end
 end
 function ZLM:ChatReport(player,test,channel)
-    local output = {};
     channel = channel or "WHISPER"
     local prefix;
     local prefixpattern;
@@ -123,8 +125,8 @@ function ZLM:ChatReport(player,test,channel)
         prefixpattern = "don'tmatchme";
         prefix = "[test]"
     else
-        prefixpattern = ZLMPrefixPattern;
-        prefix = ZLMPrefix;
+        prefixpattern = "%[ZLM\]";
+        prefix = "[ZLM]";
     end
     SendChatMessage(prefix.." ZLM Standings:", channel, nil, player);
     --Reply with the whole list.
@@ -149,7 +151,11 @@ function ZLM:ChatReport(player,test,channel)
 
 end
 function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
-        for k, v in pairs(caseInsensitiveWords) do
+    local words = {
+        "^![Ll][Oo][Tt][Tt][Oo]",
+        "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
+    }
+        for k, v in pairs(words) do
             if not not string.match(message,v) then
                 local test = not not string.match(message,"^lottotest");
                 ZLM:ChatReport(author,test);
@@ -158,8 +164,11 @@ function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
 end
 function ZLM:CHAT_MSG_GUILD(event, message, author,...)
     if ZLM.GuildChatCooldown then return; end
-
-    for k, v in pairs(caseInsensitiveWords) do
+    local words = {
+        "^![Ll][Oo][Tt][Tt][Oo]",
+        "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
+    }
+    for k, v in pairs(words) do
         if not not string.match(message,v) then
             local test = not not string.match(message,"^lottotest");
             ZLM:ChatReport(author,test,"GUILD");
@@ -170,6 +179,10 @@ function ZLM:CHAT_MSG_GUILD(event, message, author,...)
     end
 end
 function ZLM_ChatFilter(self,event,myChatMessage, author,...)
+    local words = {
+        "^![Ll][Oo][Tt][Tt][Oo]",
+        "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
+    }
     if type(myChatMessage) == "string" then
     --Hide whisper if it's our prefix
         if not not string.match(myChatMessage,ZLMPrefixPattern) then
@@ -177,7 +190,7 @@ function ZLM_ChatFilter(self,event,myChatMessage, author,...)
             return true, myChatMessage, author, ...;
         end
     --Hide whisper if it's one of our words.
-        for k, v in pairs(caseInsensitiveWords) do
+        for k, v in pairs(words) do
             if not not string.match(myChatMessage,v) then
                -- SendChatMessage("True now!", "WHISPER", nil, author);
                 return true, myChatMessage, author, ...;

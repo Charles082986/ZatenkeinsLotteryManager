@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="29cf78cd-63c7-43c9-bce4-c26705adefd4" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/Core.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Core.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ZLM_ChatReports.lua" beforeDir="false" afterPath="$PROJECT_DIR$/ZLM_ChatReports.lua" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -20,17 +19,8 @@
       <file leaf-file-name="ZLM_ChatReports.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="116">
-              <caret line="47" column="21" lean-forward="true" selection-start-line="47" selection-start-column="21" selection-end-line="47" selection-end-column="21" />
-              <folding>
-                <element signature="e#14#111#1" />
-                <element signature="n#ZLM:PlayerName#0" />
-                <element signature="n#ZLM_CreateChatReportTestData#0" />
-                <element signature="n#ZLM:ChatReport#0" />
-                <element signature="n#ZLM:CHAT_MSG_WHISPER#0" />
-                <element signature="n#ZLM:CHAT_MSG_GUILD#0" />
-                <element signature="n#ZLM_ChatFilter#0" />
-              </folding>
+            <state relative-caret-position="269">
+              <caret line="187" column="68" lean-forward="true" selection-start-line="187" selection-start-column="68" selection-end-line="187" selection-end-column="68" />
             </state>
           </provider>
         </entry>
@@ -136,12 +126,12 @@
       <workItem from="1526925322405" duration="392000" />
       <workItem from="1527004068741" duration="16479000" />
       <workItem from="1527028355767" duration="930000" />
-      <workItem from="1527083761405" duration="4075000" />
+      <workItem from="1527083761405" duration="5338000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31217000" />
+    <option name="totallyTimeSpent" value="32480000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="0" width="1400" height="1085" extended-state="0" />
@@ -180,15 +170,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="901">
           <caret line="53" column="8" selection-start-line="53" selection-start-column="8" selection-end-line="53" selection-end-column="8" />
-          <folding>
-            <element signature="e#14#111#1" />
-            <element signature="n#ZLM:PlayerName#0" />
-            <element signature="n#ZLM_CreateChatReportTestData#0" />
-            <element signature="n#ZLM:ChatReport#0" />
-            <element signature="n#ZLM:CHAT_MSG_WHISPER#0" />
-            <element signature="n#ZLM:CHAT_MSG_GUILD#0" />
-            <element signature="n#ZLM_ChatFilter#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -278,17 +259,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="116">
-          <caret line="47" column="21" lean-forward="true" selection-start-line="47" selection-start-column="21" selection-end-line="47" selection-end-column="21" />
-          <folding>
-            <element signature="e#14#111#1" />
-            <element signature="n#ZLM:PlayerName#0" />
-            <element signature="n#ZLM_CreateChatReportTestData#0" />
-            <element signature="n#ZLM:ChatReport#0" />
-            <element signature="n#ZLM:CHAT_MSG_WHISPER#0" />
-            <element signature="n#ZLM:CHAT_MSG_GUILD#0" />
-            <element signature="n#ZLM_ChatFilter#0" />
-          </folding>
+        <state relative-caret-position="269">
+          <caret line="187" column="68" lean-forward="true" selection-start-line="187" selection-start-column="68" selection-end-line="187" selection-end-column="68" />
         </state>
       </provider>
     </entry>
