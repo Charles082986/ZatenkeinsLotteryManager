@@ -3,7 +3,11 @@
 -- Guild reply toggle
 -- Cooldown slider
 -- Number to report
-
+ZLM_OptionDefaults.profile.Reporting = {
+    maxReportsResults = 5,
+    guildReply = true,
+    guildReplyCooldown = 4
+}
 ZLM_OptionsTable.args.Reporting = {
     name = "Reporting",
     type = "group",
@@ -39,10 +43,10 @@ ZLM_OptionsTable.args.Reporting = {
             type = "range",
             min = 0,
             max = 10,
-            step = 1,
-            bigStep = 1,
+            step = 0.5,
+            bigStep = 0.5,
             set = "SetGuildReplyCooldown",
-            get = "SetGuildReplyCooldown",
+            get = "GetGuildReplyCooldown",
             order = 3,
             descStyle="inline"
         },
@@ -68,7 +72,7 @@ function ZLM:GetGuildReplyCooldown(_)
 end
 
 
-ZLM_MAX_REPORT_RANKS = 5;
+--ZLM_MAX_REPORT_RANKS = 5;
 ZLM.GuildChatCooldown = false;
 --[[
 local ZLMPrefixPattern = "%[ZLM\]";
@@ -128,27 +132,28 @@ function ZLM:ChatReport(player,test,channel)
         prefixpattern = "%[ZLM\]";
         prefix = "[ZLM]";
     end
-    SendChatMessage(prefix.." ZLM Standings:", channel, nil, player);
+    --SendChatMessage(prefix.." ZLM Standings:", channel, nil, player);
     --Reply with the whole list.
     SendChatMessage(prefix.." Rank--Points--Name", channel, nil, player);
     for i,v in ipairs(ZLM_ScoreboardData) do
-        if i > ZLM_MAX_REPORT_RANKS then break; end
+        if i > ZLM:GetMaxReportResults() then break; end
         local rank = i;
         local character = v.Name;
         local points = v.Points;
         SendChatMessage(prefix.." "..rank.." ....... "..points.." ....... "..character, channel, nil, player);
     end
-    SendChatMessage(prefix.."------------------", channel, nil, player);
+    --SendChatMessage(prefix.."------------------", channel, nil, player);
     --Find if guy messaging is on the Scoreboard.
     for i,v in ipairs(ZLM_ScoreboardData) do
-        print(ZLM:PlayerName(v.Name).." "..player);
+        --print(ZLM:PlayerName(v.Name).." "..player);
         if ZLM:PlayerName(v.Name) == player then
             -- Insert personalized report.
             SendChatMessage(prefix.." Your rank: "..i, channel, nil, player);
         end
     end
-    print("Lottery info sent to: "..player)
-
+    if channel == "WHISPER" then
+        print("Lottery info sent to: "..player)
+    end
 end
 function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
     local words = {
@@ -163,18 +168,28 @@ function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
         end
 end
 function ZLM:CHAT_MSG_GUILD(event, message, author,...)
-    if ZLM.GuildChatCooldown then return; end
+    if ZLM.GuildChatCooldown or not ZLM:GetGuildReply()then return; end
     local words = {
         "^![Ll][Oo][Tt][Tt][Oo]",
         "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
     }
+    --remove main name from incognito type addons.
+    if not not string.match(message,"^%(") and not not string.match(message,"%)") then
+        message = string.gsub(message,"^(.*): ","")
+    end
     for k, v in pairs(words) do
         if not not string.match(message,v) then
             local test = not not string.match(message,"^lottotest");
             ZLM:ChatReport(author,test,"GUILD");
             -- Invoke cooldown;
             ZLM.GuildChatCooldown = true;
-            C_Timer.After(150, function() print("Guild Cooldown Reset.") ZLM.GuildChatCooldown = false; end);
+            ZLM:Wait(ZLM:GetGuildReplyCooldown() * 30,
+                function()
+                    if ZLM:GetGuildReplyCooldown() > 0 then
+                       print("Guild Cooldown Reset.");
+                    end
+                    ZLM.GuildChatCooldown = false;
+                end);
         end
     end
 end
@@ -183,9 +198,10 @@ function ZLM_ChatFilter(self,event,myChatMessage, author,...)
         "^![Ll][Oo][Tt][Tt][Oo]",
         "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
     }
+    local prefixpattern = "%[ZLM\]";
     if type(myChatMessage) == "string" then
     --Hide whisper if it's our prefix
-        if not not string.match(myChatMessage,ZLMPrefixPattern) then
+        if not not string.match(myChatMessage,prefixpattern) then
             --print("It's a prefix!"..myChatMessage.." == "..ZLMPrefix);
             return true, myChatMessage, author, ...;
         end

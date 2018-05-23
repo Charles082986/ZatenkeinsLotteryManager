@@ -19,8 +19,8 @@
       <file leaf-file-name="ZLM_ChatReports.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="187" column="68" lean-forward="true" selection-start-line="187" selection-start-column="68" selection-end-line="187" selection-end-column="68" />
+            <state relative-caret-position="524">
+              <caret line="176" column="78" selection-start-line="176" selection-start-column="78" selection-end-line="176" selection-end-column="78" />
             </state>
           </provider>
         </entry>
@@ -37,8 +37,8 @@
       <file leaf-file-name="Core.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Core.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1064">
-              <caret line="211" column="29" lean-forward="true" selection-start-line="211" selection-start-column="29" selection-end-line="211" selection-end-column="29" />
+            <state relative-caret-position="187">
+              <caret line="186" column="30" lean-forward="true" selection-start-line="186" selection-start-column="30" selection-end-line="186" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -59,6 +59,12 @@
       <find>zatenkeinslotterymanagerdb</find>
       <find>zatenkein</find>
       <find>scoreboarddata</find>
+      <find>ZLM_ma</find>
+      <find>get</find>
+      <find>getmax</find>
+      <find>chatcool</find>
+      <find>wait</find>
+      <find>prefixpattern</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -126,12 +132,12 @@
       <workItem from="1526925322405" duration="392000" />
       <workItem from="1527004068741" duration="16479000" />
       <workItem from="1527028355767" duration="930000" />
-      <workItem from="1527083761405" duration="5338000" />
+      <workItem from="1527083761405" duration="9995000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="32480000" />
+    <option name="totallyTimeSpent" value="37137000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-6" y="0" width="1400" height="1085" extended-state="0" />
@@ -252,15 +258,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Core.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1064">
-          <caret line="211" column="29" lean-forward="true" selection-start-line="211" selection-start-column="29" selection-end-line="211" selection-end-column="29" />
+        <state relative-caret-position="187">
+          <caret line="186" column="30" lean-forward="true" selection-start-line="186" selection-start-column="30" selection-end-line="186" selection-end-column="30" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="187" column="68" lean-forward="true" selection-start-line="187" selection-start-column="68" selection-end-line="187" selection-end-column="68" />
+        <state relative-caret-position="524">
+          <caret line="176" column="78" selection-start-line="176" selection-start-column="78" selection-end-line="176" selection-end-column="78" />
         </state>
       </provider>
     </entry>
