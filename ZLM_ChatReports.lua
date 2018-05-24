@@ -105,6 +105,7 @@ function ZLM:PlayerName(player)
     player = string.gsub(player,"%s", "")
     return player;
 end
+
 function ZLM_CreateChatReportTestData(key)
     if key ~= #ZLM_ScoreboardData then return; end;
     print("Populating test data table.");
@@ -121,9 +122,58 @@ function ZLM_CreateChatReportTestData(key)
         ZLM_ScoreboardData[i].Points = 1000 - i*50;
     end
 end
+function ZLM:GetPlayerRank(player)
+    for i,v in ipairs(ZLM_ScoreboardData) do
+        --print(ZLM:PlayerName(v.Name).." "..player);
+        if ZLM:PlayerName(v.Name) == ZLM:PlayerName(player) then
+            -- Insert personalized report.
+            return i, v.Points;
+        end
+    end
+end
+function ZLM:GetScoreByRank(rank)
+    if not not ZLM_ScoreboardData[rank] then
+        return  ZLM_ScoreboardData[rank];
+    end
+    return 0;
+end
 function ZLM:ChatReport(player,test,channel)
     channel = channel or "WHISPER"
+    local requestorRank,_ = ZLM:GetPlayerRank(player); -- returns number
+    local reportLimit = ZLM:GetMaxReportResults();
+    local printAtEnd = false;
     local prefix;
+    local prefixpattern;
+    if test then
+        --prefixpattern = "don'tmatchme";
+        prefix = "[test]"
+    else
+        --prefixpattern = "%[ZLM\]";
+        prefix = "[ZLM]";
+    end
+    if requestorRank > reportLimit then reportLimit = reportLimit - 1; printAtEnd = true; end
+    if reportLimit > 0 then
+        local firstTrailLength = 12
+        local firstPadding = "............";
+        SendChatMessage(prefix.." Place....Score.......Name", channel, nil, player);
+        for i = 1,reportLimit do
+            local rankLength = math.floor(math.log10(i)+1)
+            local score = ZLM:GetScoreByRank(i);
+            local scoreLength =math.floor(math.log10(score.Points)+1)
+            local padding1 = string.sub(firstPadding,1,firstTrailLength - rankLength);
+            local padding2 = string.sub(firstPadding,1,firstTrailLength - scoreLength);
+            SendChatMessage(prefix.." "..i .. padding1 .. score.Points .. padding2 .. score.Name, channel, nil, player);
+        end
+        if printAtEnd then
+            local rankLength = math.floor(math.log10(requestorRank)+1)
+            local score = ZLM:GetScoreByRank(requestorRank);
+            local scoreLength =math.floor(math.log10(score.Points)+1)
+            local padding1 = string.sub(firstPadding,1,firstTrailLength - rankLength);
+            local padding2 = string.sub(firstPadding,1,firstTrailLength - scoreLength);
+            SendChatMessage(prefix.." "..requestorRank .. padding1 .. score.Points .. padding2 .. score.Name, channel, nil, player);
+        end
+    end
+--[[    local prefix;
     local prefixpattern;
     if test then
         prefixpattern = "don'tmatchme";
@@ -150,9 +200,9 @@ function ZLM:ChatReport(player,test,channel)
             -- Insert personalized report.
             SendChatMessage(prefix.." Your rank: "..i, channel, nil, player);
         end
-    end
+    end]]--
     if channel == "WHISPER" then
-        print("Lottery info sent to: "..player)
+        print("Lottery scoreboard info requested by, and sent to: "..player)
     end
 end
 function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
