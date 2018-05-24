@@ -19,8 +19,8 @@
       <file leaf-file-name="ZLM_ChatReports.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="522">
-              <caret line="162" column="30" selection-start-line="162" selection-start-column="30" selection-end-line="162" selection-end-column="30" />
+            <state relative-caret-position="507">
+              <caret line="162" column="25" lean-forward="true" selection-start-line="162" selection-start-column="25" selection-end-line="162" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -65,6 +65,7 @@
       <find>chatcool</find>
       <find>wait</find>
       <find>prefixpattern</find>
+      <find>numrecords</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -133,12 +134,12 @@
       <workItem from="1527004068741" duration="16479000" />
       <workItem from="1527028355767" duration="930000" />
       <workItem from="1527083761405" duration="12426000" />
-      <workItem from="1527171478753" duration="6546000" />
+      <workItem from="1527171478753" duration="11409000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="46114000" />
+    <option name="totallyTimeSpent" value="50977000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1010" y="0" width="1400" height="1085" extended-state="0" />
@@ -315,8 +316,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_ChatReports.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="162" column="30" selection-start-line="162" selection-start-column="30" selection-end-line="162" selection-end-column="30" />
+        <state relative-caret-position="507">
+          <caret line="162" column="25" lean-forward="true" selection-start-line="162" selection-start-column="25" selection-end-line="162" selection-end-column="25" />
         </state>
       </provider>
     </entry>

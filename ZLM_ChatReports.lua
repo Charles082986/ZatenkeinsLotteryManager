@@ -123,13 +123,15 @@ function ZLM_CreateChatReportTestData(key)
     end
 end
 function ZLM:GetPlayerRank(player)
+    local rank = 0;
     for i,v in ipairs(ZLM_ScoreboardData) do
         --print(ZLM:PlayerName(v.Name).." "..player);
-        if ZLM:PlayerName(v.Name) == ZLM:PlayerName(player) then
+        if ZLM:PlayerName(v.Name) == ZLM:PlayerName(tostring(player)) then
             -- Insert personalized report.
-            return i, v.Points;
+            rank = i;
         end
     end
+    return rank;
 end
 function ZLM:GetScoreByRank(rank)
     if not not ZLM_ScoreboardData[rank] then
@@ -137,9 +139,17 @@ function ZLM:GetScoreByRank(rank)
     end
     return 0;
 end
+function ZLM:Announce(message,channel,player)
+    if channel == "BATTLE.NET" then
+        BNSendWhisper(player,message);
+    else
+        SendChatMessage(message, channel, nil, player);
+    end
+
+end
 function ZLM:ChatReport(player,test,channel)
     channel = channel or "WHISPER"
-    local requestorRank,_ = ZLM:GetPlayerRank(player); -- returns number
+    local requestorRank,_ = ZLM:GetPlayerRank(player);  -- returns number
     local reportLimit = ZLM:GetMaxReportResults();
     local numRecords = #ZLM_ScoreboardData;
     local printAtEnd = false;
@@ -156,7 +166,7 @@ function ZLM:ChatReport(player,test,channel)
     if reportLimit > 0 then
         local firstTrailLength = 12
         local firstPadding = "............";
-        SendChatMessage(prefix.." Place....Score.......Name", channel, nil, player);
+        ZLM:Announce(prefix.." Place....Score.......Name", channel, player);
         for i = 1,reportLimit do
             if i > numRecords then break; end
             local rankLength = math.floor(math.log10(i)+1)
@@ -165,9 +175,9 @@ function ZLM:ChatReport(player,test,channel)
             local padding1 = string.sub(firstPadding,1,firstTrailLength - rankLength);
             local padding2 = string.sub(firstPadding,1,firstTrailLength - scoreLength);
             if ZLM:PlayerName(player)== ZLM:PlayerName(score.Name) then
-                SendChatMessage(prefix..">"..i .. padding1 .. score.Points .. padding2 .. score.Name.."<", channel, nil, player);
+                ZLM:Announce(prefix.."*"..i .. padding1 .. score.Points .. padding2 .. score.Name.." <--", channel, player);
             else
-                 SendChatMessage(prefix.." "..i .. padding1 .. score.Points .. padding2 .. score.Name, channel, nil, player);
+                 ZLM:Announce(prefix.." "..i .. padding1 .. score.Points .. padding2 .. score.Name, channel, player);
             end
         end
         if printAtEnd then
@@ -176,7 +186,7 @@ function ZLM:ChatReport(player,test,channel)
             local scoreLength =math.floor(math.log10(score.Points)+1)
             local padding1 = string.sub(firstPadding,1,firstTrailLength - rankLength);
             local padding2 = string.sub(firstPadding,1,firstTrailLength - scoreLength);
-            SendChatMessage(prefix..">"..requestorRank .. padding1 .. score.Points .. padding2 .. score.Name.. "<", channel, nil, player);
+                ZLM:Announce(prefix.."*"..requestorRank .. padding1 .. score.Points .. padding2 .. score.Name.. " <--", channel, player);
         end
     end
 --[[    local prefix;
@@ -211,23 +221,32 @@ function ZLM:ChatReport(player,test,channel)
         print("Lottery scoreboard info requested by, and sent to: "..player)
     end
 end
-function ZLM:CHAT_MSG_WHISPER(event, message, author,...)
+function ZLM:CHAT_MSG_WHISPER(event, message, author, _, _, arg5, flag, _,_,_,arg10,_,_,id)
     local words = {
         "^![Ll][Oo][Tt][Tt][Oo]",
         "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
     }
+    local channel = "WHISPER"
+   -- print("Battle.net ID? : ".. id);
+    if event == "CHAT_MSG_BN_WHISPER" then
+        channel = "BATTLE.NET";
+       -- print("Battle.net ID? : ".. author);
+        author = id;
+
+    end
     if not not string.match(message,"^%(") and not not string.match(message,"%)") then
         message = string.gsub(message,"^(.*): ","")
     end
         for k, v in pairs(words) do
             if not not string.match(message,v) then
-                local test = not not string.match(message,"^lottotest");
-                ZLM:ChatReport(author,test);
+                local test = not not string.match(message,"^!lottotest");
+                ZLM:ChatReport(author,test, channel);
             end
         end
 end
 function ZLM:CHAT_MSG_GUILD(event, message, author,...)
     if ZLM.GuildChatCooldown or not ZLM:GetGuildReply()then return; end
+
     local words = {
         "^![Ll][Oo][Tt][Tt][Oo]",
         "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
@@ -238,7 +257,7 @@ function ZLM:CHAT_MSG_GUILD(event, message, author,...)
     end
     for k, v in pairs(words) do
         if not not string.match(message,v) then
-            local test = not not string.match(message,"^lottotest");
+            local test = not not string.match(message,"^!lottotest");
             ZLM:ChatReport(author,test,"GUILD");
             -- Invoke cooldown;
             ZLM.GuildChatCooldown = true;
@@ -277,8 +296,10 @@ function ZLM_ChatFilter(self,event,myChatMessage, author,...)
 end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER",ZLM_ChatFilter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM",ZLM_ChatFilter);
+ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER",ZLM_ChatFilter);
 ZLM:RegisterEvent("CHAT_MSG_WHISPER");
 ZLM:RegisterEvent("CHAT_MSG_GUILD");
+ZLM:RegisterEvent("CHAT_MSG_BN_WHISPER",function(...) ZLM:CHAT_MSG_WHISPER(...); end);
 
 
 
