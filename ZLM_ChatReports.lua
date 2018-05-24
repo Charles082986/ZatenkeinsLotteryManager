@@ -141,6 +141,7 @@ function ZLM:ChatReport(player,test,channel)
     channel = channel or "WHISPER"
     local requestorRank,_ = ZLM:GetPlayerRank(player); -- returns number
     local reportLimit = ZLM:GetMaxReportResults();
+    local numRecords = #ZLM_ScoreboardData;
     local printAtEnd = false;
     local prefix;
     local prefixpattern;
@@ -157,12 +158,17 @@ function ZLM:ChatReport(player,test,channel)
         local firstPadding = "............";
         SendChatMessage(prefix.." Place....Score.......Name", channel, nil, player);
         for i = 1,reportLimit do
+            if i > numRecords then break; end
             local rankLength = math.floor(math.log10(i)+1)
             local score = ZLM:GetScoreByRank(i);
             local scoreLength =math.floor(math.log10(score.Points)+1)
             local padding1 = string.sub(firstPadding,1,firstTrailLength - rankLength);
             local padding2 = string.sub(firstPadding,1,firstTrailLength - scoreLength);
-            SendChatMessage(prefix.." "..i .. padding1 .. score.Points .. padding2 .. score.Name, channel, nil, player);
+            if ZLM:PlayerName(player)== ZLM:PlayerName(score.Name) then
+                SendChatMessage(prefix..">"..i .. padding1 .. score.Points .. padding2 .. score.Name.."<", channel, nil, player);
+            else
+                 SendChatMessage(prefix.." "..i .. padding1 .. score.Points .. padding2 .. score.Name, channel, nil, player);
+            end
         end
         if printAtEnd then
             local rankLength = math.floor(math.log10(requestorRank)+1)
@@ -170,7 +176,7 @@ function ZLM:ChatReport(player,test,channel)
             local scoreLength =math.floor(math.log10(score.Points)+1)
             local padding1 = string.sub(firstPadding,1,firstTrailLength - rankLength);
             local padding2 = string.sub(firstPadding,1,firstTrailLength - scoreLength);
-            SendChatMessage(prefix.." "..requestorRank .. padding1 .. score.Points .. padding2 .. score.Name, channel, nil, player);
+            SendChatMessage(prefix..">"..requestorRank .. padding1 .. score.Points .. padding2 .. score.Name.. "<", channel, nil, player);
         end
     end
 --[[    local prefix;
