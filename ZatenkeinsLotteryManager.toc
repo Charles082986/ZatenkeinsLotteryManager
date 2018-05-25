@@ -17,4 +17,5 @@ ZLM_Scoreboard.lua
 ZLM_Bountyboard.lua
 ZLM_MailReader.lua
 ZLM_ChatReports.lua
+ZLM_TestSuite.lua
 
