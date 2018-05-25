@@ -46,6 +46,8 @@ ZLM_OptionDefaults = {
     global = {
         Donations = {},
         Prizes = {},
+        Scoreboard = {}
+
     }
 };
 ZLM_FrameStateOptions = {
@@ -291,8 +293,20 @@ function ZLM:RunLottery() -- TO DO: Needs update without params.
 	end
 	ZLM:AnnounceWinners(winners,lotteryMethod);
 end
+function ZLM:GetDonationsWithinTimeframe()
+    local time1 = time(self.db.profile.ScoreboardStartDateTimeDatePicker);
+    local time2 = time(self.db.profile.ScoreboardEndDateTimeDatePicker);
+    local output = {};
+    for i = 1,#(self.db.global.Donations),1 do
+        local logItem = self.db.global.Donations[i];
+        if time(logItem.Timestamp) >= time1 and time(logItem.Timestamp) <= time2 then
+            tinsert(output,logItem);
+        end
+    end
+    return output;
+end
 function ZLM:UpdateScoreboard()
-	local donations = GetDonationsWithinTimeFrame();
+	local donations = ZLM:GetDonationsWithinTimeframe();
     local pointsTable = {};
     for _,v in ipairs(ZLM.db.profile.Bounties) do
         if v.HotItem then
@@ -326,10 +340,10 @@ function ZLM:GetRaffleWinners()
 	local winners = {};
 	if self.db.profile.ExclusiveWinners == nil then self.db.profile.ExclusiveWinners = true; end
 	while #(winners) < ZLM.db.profile.NumberOfWinners do
-		local roll = math.random(self.db.records.TotalPoints);
+		local roll = math.random(self.db.Global.TotalPoints);
 		local base = 0;
-		for i = 1,#(self.db.records.Scoreboard) do
-			local ticket = self.db.records.Scoreboard[i];
+		for i = 1,#(self.db.Global.Scoreboard) do
+			local ticket = self.db.Global.Scoreboard[i];
 			if roll > base and roll <= (ticket.Points + base) then
 				if (self.db.profile.ExlusiveWInners) or (not self.Contains(winners,"Name",ticket.Name)) or (self.Contains(winners,"Name",ticket.Name) and not self.db.profile.ExclusiveWinners) then
 					tinsert(winners,{ Roll = roll, Name = ticket.Name });
@@ -449,29 +463,18 @@ function ZLM:ShowBountyboard()
         ZLM.bountyboard = bountyBoard;
     end
 end
-function ZLM:GetDonationsWithinTimeframe()
-    local time1 = time(self.db.profile.ScoreboardStartDateTimeDatePicker);
-    local time2 = time(self.db.profile.ScoreboardEndDateTimeDatePicker);
-    local output = {};
-    for i = 1,#(self.db.records.Donations),1 do
-        local logItem = self.db.global.Donations[i];
-        if logItem.Timestamp >= time1 and logItem.Timestamp <= time2 then
-            tinstert(output,logItem);
-        end
-    end
-    return output;
-end
+
 function ZLM:LogDonation(nameRealmCombo,itemId,quantity) -- Add a new record to the donation log.
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
     itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID,
     isCraftingReagent = GetItemInfo(itemId);
-    tinsert(ZLM.db.global.Donations,{ Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, ItemLink = itemLink, timestamp = date("*t")});
+    tinsert(ZLM.db.global.Donations,{ Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, ItemLink = itemLink, Timestamp = date("*t",GetServerTime())});
 end
 function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a specific time.
     local purgeTime = time(dateObj);
     for i = #(self.db.global.Donations),1,-1 do
         local entry = self.db.global.Donations[i];
-        if entry.Timestamp < purgeTime then
+        if time(entry.Timestamp) < purgeTime then
             tremove(self.db.global.Donations,i);
         end
     end
@@ -491,13 +494,13 @@ ZLM_Donation = {
     Name = "Defaultname-Default Realm",
     ItemId = 12345,
     Quantity = 0,
-    Timestamp = 0,
+    Timestamp = date("*t",1000216740)
 }
 function ZLM_Donation:new(nameRealmCombo,itemId,quantity)
     local donation = {};
     donation.Name = nameRealmCombo;
     donation.ItemId = itemId;
     donation.Quantity = quantity;
-    donation.Timestamp = GetServerTime();
+    donation.Timestamp = date("*t",GetServerTime());
     return donation;
 end
