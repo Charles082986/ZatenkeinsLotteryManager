@@ -1,8 +1,5 @@
-
-
--- Guild reply toggle
--- Cooldown slider
--- Number to report
+ZLM.ChatReplyWords = { "^![Ll][Oo][Tt][Tt][Oo]", "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]","^![Zz][Ll][Mm]" };
+ZLM.ChatReplyTestWord = "^!lottotest";
 ZLM_OptionDefaults.profile.Reporting = {
     maxReportsResults = 5,
     guildReply = true,
@@ -82,22 +79,6 @@ function ZLM:PlayerName(player)
     player = string.gsub(player,"%s", "")
     return player;
 end
---[[function ZLM_CreateChatReportTestData(key)
-    if key ~= #ZLM_ScoreboardData then return; end;
-    --print("Populating test data table.");
-    for i=1, 7 do
-        ZLM_ScoreboardData[i] = {}
-
-        if i == 3 then
-            ZLM_ScoreboardData[i].Name = "Zatenkein-Shadow Council";
-        elseif i == 2 then
-            ZLM_ScoreboardData[i].Name = UnitName("player").."-" .. GetRealmName();
-        else
-            ZLM_ScoreboardData[i].Name = "bob"..i;
-        end
-        ZLM_ScoreboardData[i].Points = 1000 - i*50;
-    end
-end]]
 function ZLM:GetPlayerRank(player)
     local rank = 0;
     for i,v in ipairs(ZLM_ScoreboardData) do
@@ -121,7 +102,6 @@ function ZLM:Announce(message,channel,player)
     else
         SendChatMessage(message, channel, nil, player);
     end
-
 end
 function ZLM:ChatReport(player,test,channel)
     channel = channel or "WHISPER"
@@ -169,59 +149,41 @@ function ZLM:ChatReport(player,test,channel)
         print("Lottery scoreboard info requested by, and sent to: "..player)
     end
 end
-function ZLM:CHAT_MSG_WHISPER(event, message, author, _, _, arg5, flag, _,_,_,arg10,_,_,id)
-    local words = {
-        "^![Ll][Oo][Tt][Tt][Oo]",
-        "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
-    }
-    local channel = "WHISPER"
-   -- print("Battle.net ID? : ".. id);
+function ZLM.ChatEvent(event, message, author, _, _, arg5, flag, _,_,_,arg10,_,_,id)
+    local words = ZLM.ChatReplyWords;
+    local gchat = nil;
+    local channel = "WHISPER";
+    if event == "CHAT_MSG_GUILD" then
+        gchat = true;
+        channel = "GUILD";
+    end
+    if gchat and ZLM.GuildChatCooldown or not ZLM:GetGuildReply()then return; end
     if event == "CHAT_MSG_BN_WHISPER" then
         channel = "BATTLE.NET";
-       -- print("Battle.net ID? : ".. author);
         author = id;
     end
     if not not string.match(message,"^%(") and not not string.match(message,"%)") then
-        message = string.gsub(message,"^(.*): ","")
-    end
-        for k, v in pairs(words) do
-            if not not string.match(message,v) then
-                local test = not not string.match(message,"^!lottotest");
-                ZLM:ChatReport(author,test, channel);
-            end
-        end
-end
-function ZLM:CHAT_MSG_GUILD(event, message, author,...)
-    if ZLM.GuildChatCooldown or not ZLM:GetGuildReply()then return; end
-    local words = {
-        "^![Ll][Oo][Tt][Tt][Oo]",
-        "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
-    }
-    --remove main name from incognito type addons.
-    if not not string.match(message,"^%(") and not not string.match(message,"%)") then
-        message = string.gsub(message,"^(.*): ","")
+        message = string.gsub(message,"^(.*): ","") -- Removes incognito type main names from message.
     end
     for k, v in pairs(words) do
         if not not string.match(message,v) then
-            local test = not not string.match(message,"^!lottotest");
-            ZLM:ChatReport(author,test,"GUILD");
-            -- Invoke cooldown;
-            ZLM.GuildChatCooldown = true;
-            ZLM:Wait(ZLM:GetGuildReplyCooldown() * 30,
-                function()
-                    if ZLM:GetGuildReplyCooldown() > 0 then
-                       --print("Guild Cooldown Reset.");
-                    end
-                    ZLM.GuildChatCooldown = false;
-                end);
+            local test = not not string.match(message,ZLM.ChatReplyTestWord);
+            ZLM:ChatReport(author,test, channel);
+            if gchat then
+                ZLM.GuildChatCooldown = true;
+                ZLM:Wait(ZLM:GetGuildReplyCooldown() * 30,
+                    function()
+                        if ZLM:GetGuildReplyCooldown() > 0 then
+                            --print("Guild Cooldown Reset.");
+                        end
+                        ZLM.GuildChatCooldown = false;
+                    end);
+            end
         end
     end
 end
 function ZLM_ChatFilter(self,event,myChatMessage, author,...)
-    local words = {
-        "^![Ll][Oo][Tt][Tt][Oo]",
-        "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
-    }
+    local words = ZLM.ChatReplyWords;
     local prefixpattern = "%[ZLM\]";
     if type(myChatMessage) == "string" then
     --Hide whisper if it's our prefix
@@ -243,9 +205,12 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER",ZLM_ChatFilter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM",ZLM_ChatFilter);
 ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER",ZLM_ChatFilter);
-ZLM:RegisterEvent("CHAT_MSG_WHISPER");
-ZLM:RegisterEvent("CHAT_MSG_GUILD");
-ZLM:RegisterEvent("CHAT_MSG_BN_WHISPER",function(...) ZLM:CHAT_MSG_WHISPER(...); end);
-
+ZLM:RegisterEvent("CHAT_MSG_WHISPER",ZLM.ChatEvent);
+ZLM:RegisterEvent("CHAT_MSG_GUILD",ZLM.ChatEvent);
+ZLM:RegisterEvent("CHAT_MSG_BN_WHISPER",ZLM.ChatEvent);
+--[[ZLM:RegisterEvent("CHAT_MSG_WHISPER",function(...) ZLM.ChatEvent("CHAT_MSG_WHISPER",...) end);
+ZLM:RegisterEvent("CHAT_MSG_GUILD",function(...) ZLM.ChatEvent("CHAT_MSG_GUILD",...) end);
+ZLM:RegisterEvent("CHAT_MSG_BN_WHISPER",function(...) ZLM:ChatEvent("CHAT_MSG_BN_WHISPER",...); end);
+]]
 
 
