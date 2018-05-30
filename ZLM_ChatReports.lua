@@ -70,45 +70,21 @@ end
 function ZLM:GetGuildReplyCooldown(_)
     return self.db.profile.Reporting.guildReplyCooldown;
 end
-
-
---ZLM_MAX_REPORT_RANKS = 5;
 ZLM.GuildChatCooldown = false;
---[[
-local ZLMPrefixPattern = "%[ZLM\]";
-
-local ZLMPrefix = "[ZLM]";
-local words = {
-    -- add words to respond to
-    "^lotto",
-    "^!lotto" ,
-    "^!lottery",
-    "^lottery"
-
-};
-local caseInsensitiveWords = {};
-for k,v in pairs(words) do
-    -- replaces "words" with "[Ww][Oo][Rr][Dd][Ss]"
-    caseInsensitiveWords[v],_ = string.gsub(v,"%a",function(a) return "["..a:upper()..a:lower().."]" end);
-end;
-]]--
+-- Primarily used like caps()/upper() etc. to take names and make them a uniform no-space name-realm combo regardless of source.
 function ZLM:PlayerName(player)
-
-    --Try to give back Sinderion-ShadowCouncil style name every time. No spaces, full name-realm.
-    --If the name is short, like Sinderion only, add realm.
     if not string.match(player,"-") then
         local realm = GetRealmName();
         player = player.."-"..realm;
-        --player = player .."-".. string.gsub(realm,"%s", "");
+
     end
     --Remove Spaces
     player = string.gsub(player,"%s", "")
     return player;
 end
-
-function ZLM_CreateChatReportTestData(key)
+--[[function ZLM_CreateChatReportTestData(key)
     if key ~= #ZLM_ScoreboardData then return; end;
-    print("Populating test data table.");
+    --print("Populating test data table.");
     for i=1, 7 do
         ZLM_ScoreboardData[i] = {}
 
@@ -121,7 +97,7 @@ function ZLM_CreateChatReportTestData(key)
         end
         ZLM_ScoreboardData[i].Points = 1000 - i*50;
     end
-end
+end]]
 function ZLM:GetPlayerRank(player)
     local rank = 0;
     for i,v in ipairs(ZLM_ScoreboardData) do
@@ -189,34 +165,6 @@ function ZLM:ChatReport(player,test,channel)
                 ZLM:Announce(prefix.."*"..requestorRank .. padding1 .. score.Points .. padding2 .. score.Name.. " <--", channel, player);
         end
     end
---[[    local prefix;
-    local prefixpattern;
-    if test then
-        prefixpattern = "don'tmatchme";
-        prefix = "[test]"
-    else
-        prefixpattern = "%[ZLM\]";
-        prefix = "[ZLM]";
-    end
-    --SendChatMessage(prefix.." ZLM Standings:", channel, nil, player);
-    --Reply with the whole list.
-    SendChatMessage(prefix.." Rank--Points--Name", channel, nil, player);
-    for i,v in ipairs(ZLM_ScoreboardData) do
-        if i > ZLM:GetMaxReportResults() then break; end
-        local rank = i;
-        local character = v.Name;
-        local points = v.Points;
-        SendChatMessage(prefix.." "..rank.." ....... "..points.." ....... "..character, channel, nil, player);
-    end
-    --SendChatMessage(prefix.."------------------", channel, nil, player);
-    --Find if guy messaging is on the Scoreboard.
-    for i,v in ipairs(ZLM_ScoreboardData) do
-        --print(ZLM:PlayerName(v.Name).." "..player);
-        if ZLM:PlayerName(v.Name) == player then
-            -- Insert personalized report.
-            SendChatMessage(prefix.." Your rank: "..i, channel, nil, player);
-        end
-    end]]--
     if channel == "WHISPER" then
         print("Lottery scoreboard info requested by, and sent to: "..player)
     end
@@ -232,7 +180,6 @@ function ZLM:CHAT_MSG_WHISPER(event, message, author, _, _, arg5, flag, _,_,_,ar
         channel = "BATTLE.NET";
        -- print("Battle.net ID? : ".. author);
         author = id;
-
     end
     if not not string.match(message,"^%(") and not not string.match(message,"%)") then
         message = string.gsub(message,"^(.*): ","")
@@ -246,7 +193,6 @@ function ZLM:CHAT_MSG_WHISPER(event, message, author, _, _, arg5, flag, _,_,_,ar
 end
 function ZLM:CHAT_MSG_GUILD(event, message, author,...)
     if ZLM.GuildChatCooldown or not ZLM:GetGuildReply()then return; end
-
     local words = {
         "^![Ll][Oo][Tt][Tt][Oo]",
         "^![Ll][Oo][Tt][Tt][Ee][Rr][Yy]"
@@ -264,7 +210,7 @@ function ZLM:CHAT_MSG_GUILD(event, message, author,...)
             ZLM:Wait(ZLM:GetGuildReplyCooldown() * 30,
                 function()
                     if ZLM:GetGuildReplyCooldown() > 0 then
-                       print("Guild Cooldown Reset.");
+                       --print("Guild Cooldown Reset.");
                     end
                     ZLM.GuildChatCooldown = false;
                 end);

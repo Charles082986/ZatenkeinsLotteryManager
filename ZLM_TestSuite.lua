@@ -1,49 +1,7 @@
---list of items
-ZLM_OptionDefaults.profile.TestSuite = {
-    totalTestRecords = 15;
-}
-
-
--- config pane
-
-function ZLM:SetTotalTestRecords(_,value)
-    self.db.profile.TestSuite.totalTestRecords = value;
-end
-
-function ZLM:GetTotalTestRecords(_)
-    return self.db.profile.TestSuite.totalTestRecords;
-end
-
-
+ZLM_OptionDefaults.profile.TestSuite = {totalTestRecords = 15};
 function ZLM_GenerateTestData()
-    local ZLM_TestItems = {
-        "142117",
-        "127856",
-        "132212",
-        "21213",
-        "133570",
-        "129158",
-        "124115",
-        "133680",
-        "123919",
-        "123918",
-        "124110"};
-    --[[
-    "142117"="Potion of Prolonged Power",
-"127856" = "Left shark",
-"132212" = "Frothing Essence",
-"21213" = "Preserved Holly",
-"133570" = "The Hungry Magister",
-"129158" = "Starlight Rosedust",
-"124115" = "Stormscale",
-"133680" = "Slice of Bacon",
-"123919" = "Felslate",
-"123918" = "Leystone Ore",
-"124110" = "Stormray"
-]]--
-
+    local ZLM_TestItems = {"142117","127856","132212","21213","133570","129158","124115","133680","123919", "123918", "124110"};
     local count = #ZLM_TestItems;
-
     if ZLM_TestBackupData then
         ZLM:PurgeDonationLog(date("*t",GetServerTime()));
         print("Generating random data.")
@@ -75,37 +33,15 @@ function ZLM_GenerateTestData()
     else
         print("Click Backup Current Data First.")
     end
-
-
-
 end
-
--- backup code
-
--- generate random data
-
 ZLM_OptionsTable.args.TestSuite = {
     name = "Test Data",
     type = "group",
     desc = "Generate random data to test ZLM's features.",
     order = 1,
     args = {
-        totalRecords = {
-            name = "Total Test Records.",
-            desc = "The number of records in your test table",
-            descStyle = "inline",
-            type = "range",
-            min = 1,
-            max = 100,
-            step = 1,
-            bigStep = 1,
-            set = "SetTotalTestRecords",
-            get = "GetTotalTestRecords",
-            order =4,
-            descStyle="inline"
-        },
         backupData = {
-            name = "1. Backup Current Data",
+            name = "Backup Current Data",
             type = "execute",
             func = function()
                 if not ZLM_TestBackupData then
@@ -120,7 +56,7 @@ ZLM_OptionsTable.args.TestSuite = {
             order = 0
         },
         restoreData = {
-            name = "3. Restore Backup",
+            name = "Restore Backup",
             type = "execute",
             func = function()
                 if ZLM_TestBackupData then
@@ -137,30 +73,34 @@ ZLM_OptionsTable.args.TestSuite = {
             end,
             order = 3
         },
-
+        totalRecords = {
+            name = "Total Test Records.",
+            desc = "The number of records in your test table",
+            descStyle = "inline",
+            type = "range",
+            min = 1,
+            max = 100,
+            step = 1,
+            bigStep = 1,
+            set = "SetTotalTestRecords",
+            get = "GetTotalTestRecords",
+            order =4,
+            descStyle="inline"
+        },
         generateData = {
-            name = "2. Generate Test Data",
+            name = "Generate Test Data",
             type = "execute",
-            func = function()
-                ZLM_GenerateTestData();
-
-            end,
+            func = function() ZLM_GenerateTestData(); end,
             order = 2
         },
         printDataSummary = {
             name = "Print ZLM Data summary.",
             type = "execute",
-            func = function()
-                ZLM:PrintDataSummary();
-            end,
+            func = function() ZLM:PrintDataSummary(); end,
             order = 5
-
         }
-
     }
 }
-
-
 function ZLM:PrintDataSummary()
     local bountiesCount = 0;
     local scoreboardCount = 0;
@@ -172,7 +112,6 @@ function ZLM:PrintDataSummary()
     local scoreboardverdict = "Scoreboard healthy.";
     local donationsverdict = "Donations healthy."
     print(bountiesCount.." bounties, "..scoreboardCount.." scoreboard entries. "..donationsCount.." donations logged.")
-
     if type(self.db.profile.Bounties) == "table" then
         for k,v in pairs(self.db.profile.Bounties) do
             if not v.Name or not v.Points or not v.ItemId then bountyverdict = "Bounties missing things."; end
@@ -196,8 +135,6 @@ function ZLM:PrintDataSummary()
     else
         donationsverdict = "Donations table not found."
     end
-
     print(scoreboardverdict);
     print(bountyverdict);
 end
-
