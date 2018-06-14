@@ -15,6 +15,7 @@ ZLM_DatePicker.lua
 ZLM_Table.lua
 ZLM_Scoreboard.lua
 ZLM_Bountyboard.lua
+ZLM_DonationLedger.lua
 ZLM_MailReader.lua
 ZLM_ChatReports.lua
 ZLM_TestSuite.lua

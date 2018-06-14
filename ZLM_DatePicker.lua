@@ -1,13 +1,14 @@
 ZLM_DatePicker = {};
-function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueChangedCallback,defaultValue,AceGUI)
+function ZLM_DatePicker:new(width,name,controlKey,minYear,maxYear,includeTime,onValueChangedCallback,defaultValue,AceGUI,multiline)
+    multiline = multiline or false;
     if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
     --BEGIN: Create Parent Frame
     local frame = AceGUI:Create("SimpleGroup");
     local dateFrame = AceGUI:Create("SimpleGroup");
-    dateFrame:SetRelativeWidth(0.5);
+    if multiline then dateFrame:SetRelativeWidth(1); else dateFrame:SetRelativeWidth(0.49); end
     dateFrame:SetLayout("Flow");
     frame:SetLayout("Flow");
-    frame:SetFullWidth(1);
+    frame:SetRelativeWidth(width);
     --END: Create Parent Frame
     --BEGIN: Create Dropdowns
     local years = {};
@@ -89,7 +90,7 @@ function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueC
     end
     if not not includeTime then
         local timeFrame = AceGUI:Create("SimpleGroup");
-        timeFrame:SetRelativeWidth(0.5);
+        if multiline then timeFrame:SetRelativeWidth(1); else timeFrame:SetRelativeWidth(0.49); end
         timeFrame:SetLayout("Flow");
         --BEGIN: CREATE TIME DROPDOWNS
         local hours = {};
@@ -109,7 +110,7 @@ function ZLM_DatePicker:new(name,controlKey,minYear,maxYear,includeTime,onValueC
             tinsert(sixtyOrder,i);
         end
         local hoursDropdown = ZLM_DatePicker:CreateDropDown(hours,hoursOrder,baseSize,controlKey,"hour",onValueChangedCallback, defaultValue.hour);
-        local minutesDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"minute",onValueChangedCallback, defaultValue.minute);
+        local minutesDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"minute",onValueChangedCallback, defaultValue.min);
         local secondsDropdown = ZLM_DatePicker:CreateDropDown(sixty,sixtyOrder,baseSize,controlKey,"sec",onValueChangedCallback, defaultValue.sec);
         --END: CREATE TIME DROPDOWNS
         --BEGIN: ADD TIME DROPDOWNS TO PARENT
@@ -140,8 +141,10 @@ function ZLM_DatePicker:CreateDropDown(values,order,width,controlKey,callbackKey
         datepicker:SetValue(defaultValue);
     end
     datepicker:SetRelativeWidth(width);
-    datepicker:SetCallback("OnValueChanged",function(_,_,key,_)
-        callback(controlKey,callbackKey,key);
+    datepicker:SetCallback("OnValueChanged",function(me,_,key,_)
+        callback(controlKey,callbackKey,key,me);
     end);
     return datepicker;
 end
+ZLM_Controls["DatePicker"] = ZLM_DatePicker;
+ZLM_Table.Table.Types.DatePicker = "DatePicker";

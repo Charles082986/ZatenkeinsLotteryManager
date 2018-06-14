@@ -158,6 +158,14 @@ ZLM_OptionsTable = {
                 ZLM:ShowBountyboard();
                 ZLM:Debug("Showing Bountyboard",1)
             end
+        },
+        ledger = {
+            name = "Donation Ledger",
+            type = "execute",
+            func = function()
+                ZLM:ShowLedger();
+                ZLM:Debug("Showing Ledger");
+            end
         }
     }
 };
@@ -217,7 +225,8 @@ function ZLM:OnInitialize()
     if not self.db.global.Characters then self.db.global.Characters = {}; end
     if not self.db.profile.Reporting then  self.db.profile.Reporting = {}; end
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
-    self.FrameStates = {};
+    self.FrameState = { Scoreboard = ZLM_FrameStateOptions.Hidden, Bountyboard = ZLM_FrameStateOptions.Hidden };
+    ZLM:UpdateScoreboard();
     ZLM:Debug("ZLM instantiated.",1);
 end
 
@@ -293,6 +302,7 @@ function ZLM:RunLottery() -- TO DO: Needs update without params.
 	end
 	ZLM:AnnounceWinners(winners,lotteryMethod);
 end
+
 function ZLM:GetDonationsWithinTimeframe()
     local time1 = time(self.db.profile.ScoreboardStartDateTimeDatePicker);
     local time2 = time(self.db.profile.ScoreboardEndDateTimeDatePicker);
@@ -305,35 +315,43 @@ function ZLM:GetDonationsWithinTimeframe()
     end
     return output;
 end
+
+ZLM_ScoreboardData = {};
+
 function ZLM:UpdateScoreboard()
 	local donations = ZLM:GetDonationsWithinTimeframe();
     local pointsTable = {};
+    local hasPoints = false;
     for _,v in ipairs(ZLM.db.profile.Bounties) do
         if v.HotItem then
             pointsTable[v.ItemId] = v.Points * 2;
         else
             pointsTable[v.ItemId] = v.Points;
         end
+        hasPoints = true;
     end
-    ZLM_ScoreboardData = {};
-    local tempPoints = {};
-    for _,v in ipairs(donations) do
-        local points = pointsTable[v.ItemId] * v.Quantity;
-        if not not tempPoints[v.Name] then tempPoints[v.Name] = tempPoints[v.Name] + points; else tempPoints[v.Name] = points; end
-    end
-    for k,v in pairs(tempPoints) do
-        tinsert(ZLM_ScoreboardData,{ Name = k, Points = v });
-    end
-    sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
-    local rangeMin = 1;
-    for i,v in ipairs(ZLM_ScoreboardData) do
-        v.Rank = i;
-        v.Min = rangeMin;
-        v.Max = rangeMin + v.Points - 1;
-        if not not ZLM.scoreboard then
-            ZLM.scoreboard.Table.DataFrame:AddRow(v);
+    if hasPoints then
+        local tempPoints = {};
+        for _,v in ipairs(donations) do
+            local points = pointsTable[v.ItemId] * v.Quantity;
+            if not not tempPoints[v.Name] then tempPoints[v.Name] = tempPoints[v.Name] + points; else tempPoints[v.Name] = points; end
         end
-        rangeMin = v.Max + 1;
+        for k,v in pairs(tempPoints) do
+            tinsert(ZLM_ScoreboardData,{ Name = k, Points = v });
+        end
+        if #(ZLM_ScoreboardData) > 0 then
+            sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
+            local rangeMin = 1;
+            for i,v in ipairs(ZLM_ScoreboardData) do
+                v.Rank = i;
+                v.Min = rangeMin;
+                v.Max = rangeMin + v.Points - 1;
+                if not not ZLM.scoreboard then
+                    ZLM.scoreboard.Table.DataFrame:AddRow(v);
+                end
+                rangeMin = v.Max + 1;
+            end
+        end
     end
 end
 function ZLM:GetRaffleWinners()
@@ -460,15 +478,38 @@ function ZLM:ShowBountyboard()
                 end
             }
         );
+        ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
         ZLM.bountyboard = bountyBoard;
     end
 end
 
+function ZLM:ShowLedger()
+    if not not ZLM.ledger then
+        if ZLM.FrameState.Ledger == ZLM_FrameStateOptions.Hidden then
+            ZLM.ledger:Show();
+            ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Shown;
+        else
+            ZLM.ledger:Hide();
+            ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Hidden;
+        end
+    else
+        local ledger = ZLM_DonationLedger:new("Zatenkein's Lottery Manager - Donation Ledger");
+        ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Shown;
+        ZLM.ledger = ledger;
+    end
+end
+
 function ZLM:LogDonation(nameRealmCombo,itemId,quantity) -- Add a new record to the donation log.
+    local donationIndex = 0;
+    for _,v in ipairs(ZLM.db.global.Donations) do
+        if tonumber(v.Index) > donationIndex then donationIndex = tonumber(v.Index) + 1; end
+    end
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
     itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID,
     isCraftingReagent = GetItemInfo(itemId);
-    tinsert(ZLM.db.global.Donations,{ Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, ItemLink = itemLink, Timestamp = date("*t",GetServerTime())});
+    local newItem = {Index = donationIndex, Name = nameRealmCombo, ItemId = itemId, Quantity = quantity, ItemName = itemName, timestamp = date("*t")};
+    tinsert(ZLM.db.global.Donations,newItem);
+    if ZLM.ledger then ZLM.ledger:AddRow(newItem); end
 end
 function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a specific time.
     local purgeTime = time(dateObj);
