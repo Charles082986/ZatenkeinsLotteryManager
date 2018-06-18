@@ -195,7 +195,8 @@ function ZLM:OnInitialize()
     if not self.db.profile.Settings then self.db.profile.Settings = {}; end
     if not self.db.profile.Bounties then self.db.profile.Bounties = {}; end
     if not self.db.global.Characters then self.db.global.Characters = {}; end
-    if not self.db.profile.Reporting then  self.db.profile.Reporting = {}; end
+    if not self.db.global.Reporting then  self.db.global.Reporting = {}; end
+    if not self.db.global.Reporting.Scoreboard then self.db.global.reporting.Scoreboard = {}; end
     if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
     self.FrameState = { Scoreboard = ZLM_FrameStateOptions.Hidden, Bountyboard = ZLM_FrameStateOptions.Hidden };
     ZLM:UpdateScoreboard();
