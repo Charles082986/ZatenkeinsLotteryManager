@@ -7,12 +7,7 @@
 
 embeds.xml
 
-
-
 Core.lua
-ZLM_Controls.lua
-ZLM_DatePicker.lua
-ZLM_Table.lua
 ZLM_Scoreboard.lua
 ZLM_Bountyboard.lua
 ZLM_DonationLedger.lua

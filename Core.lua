@@ -176,35 +176,7 @@ function ZLM:Debug(message,severity)
         self:Print(message);
     end
 end
-ZLM.WaitTable = {};
-ZLM.WaitFrame = nil;
-function ZLM:Wait(delay,func,...)
-    if(type(delay)~="number" or type(func)~="function") then
-        return false;
-    end
-    if(ZLM.WaitFrame == nil) then
-        ZLM.WaitFrame = CreateFrame("Frame","WaitFrame", UIParent);
-        ZLM.WaitFrame:SetScript("onUpdate",function (self,elapse)
-            local count = #ZLM.WaitTable;
-            local i = 1;
-            while(i<=count) do
-                local waitRecord = tremove(ZLM.WaitTable,i);
-                local d = tremove(waitRecord,1);
-                local f = tremove(waitRecord,1);
-                local p = tremove(waitRecord,1);
-                if(d>elapse) then
-                    tinsert(ZLM.WaitTable,i,{d-elapse,f,p});
-                    i = i + 1;
-                else
-                    count = count - 1;
-                    f(unpack(p));
-                end
-            end
-        end);
-    end
-    tinsert(ZLM.WaitTable,{delay,func,{...}});
-    return true;
-end
+
 function ZLM:OnInitialize()
     self.CharacterName = UnitName("player");
     self.RealmName = GetRealmName();
@@ -448,7 +420,19 @@ function ZLM:ShowScoreboard()
                 ZLM.db.profile[controlKey] = time(ZLM.db.profile[controlKey .. "DatePicker"]);
             end,
             AnnounceScoreboard = function() print("beep boop"); end,
-            AnnounceQuantityChanged = function() print("doobadee"); end},
+            AnnounceQuantityChanged = function() local inbox_items, total_items = GetInboxNumItems();
+                for i = 1, inbox_items do
+                    local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
+                    textCreated, canReply, isGM = GetInboxHeaderInfo(i);
+                    ZLM:Debug("GetNextMailData - Sender: " .. sender);
+                    if sender then
+                        sender = ZLM:FullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
+                    end
+                    if hasItem and hasItem > 0 and not not sender then
+                        return { index = i, sender = sender };
+                    end
+                end
+                return nil end},
             { StartDate = ZLM.db.profile.ScoreboardStartDateTimeDatePicker, EndDate = ZLM.db.profile.ScoreboardEndDateTimeDatePicker, AnnounceQuantity = 5 });
         table.sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
         for i,v in ipairs(ZLM_ScoreboardData) do
@@ -461,6 +445,7 @@ function ZLM:ShowScoreboard()
     end
 
 end
+
 function ZLM:ShowBountyboard()
     if not not ZLM.bountyboard then
         if ZLM.FrameState.Bountyboard == ZLM_FrameStateOptions.Hidden then
@@ -521,16 +506,6 @@ function ZLM:PurgeDonationLog(dateObj) -- Purge all DonationLog records before a
     end
 end
 
-function ZLM:MakeTooltip(itemLink)
-    ZLM:Debug("Setting Tooltip - " .. itemLink);
-    GameTooltip:SetOwner(self,"ANCHOR_CURSOR");
-    GameTooltip:SetHyperlink(itemLink);
-    GameTolltip:Show();
-end
-
-function ZLM:ClearTooltip()
-    GameTooltip:Hide();
-end
 ZLM_Donation = {
     Name = "Defaultname-Default Realm",
     ItemId = 12345,

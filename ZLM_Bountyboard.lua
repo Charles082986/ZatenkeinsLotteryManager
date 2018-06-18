@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ZLM_Bountyboard = {};
 ZLM_Bountyboard.StructureArray = {
     ItemId = { Type = ZLM_Table.Types.Input, Width = 0.1 },
@@ -147,4 +148,3 @@ function ZLM_Bountyboard_DeleteCallback(me)
         end
     end
     me.parent.parent:DoLayout();
-end

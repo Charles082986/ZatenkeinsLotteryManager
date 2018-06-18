@@ -1,165 +1,127 @@
-ZLM.MailSemaphore = {}
-ZLM.MailStateOptions = {
-    Closed = 0,
-    Open = 1
-};
-ZLM.MailState = ZLM.MailStateOptions.Closed;
-ZLM.MailWorkerStates = {
-    Working = 0;
-    Available = 1;
-}
-ZLM.MailWorker = ZLM.MailWorkerStates.Available;
-function ZLM.MailSemaphore:renew(count,callback,...)
-    self.Count = count;
-    self.Itterations = 0;
-    self._callback = callback;
-    self._args = {...};
-    if not self.AddCount then
-        function self:AddCount(increase)
-            increase = increase or 1;
-            self.Count = self.Count + increase;
-        end
-    end
-    if not self.Itterate then
-        function self:Itterate(increase)
-            increase = increase or 1;
-            self.Itterations = self.Itterations + increase;
-            if self.Itterations >= self.Count then
-                self:_callback(unpack(self._args));
+ZLM_Mailman = {
+    new = function(self)
+        return {
+            MailWorker = "Available",
+            MailState = "Closed",
+            GetInventorySnapshot = self.__GetInventorySnapshot;
+            CompareSnapshots = self.__CompareSnapshots;
+            GetMailData = self.__GetMailData;
+            BeginGetMailItems = self.__BeginGetMailItems;
+            EndGetMailItems = self.__EndGetMailItems;
+            EmptyLetterContents = self.__EmptyLetterContents;
+            SemaphoreCallback = self.__SemaphoreCallback;
+            Await = self.__Await;
+        };
+
+    end,
+    __GetInventorySnapshot = function(self)
+        local Snapshot = {};
+        for i= 1, 5 do
+            local numberOfSlots = GetContainerNumSlots(i);
+            for j = 1, numberOfSlots do
+                local itemId = GetContainerItemID(i, j);
+                if not not itemId then
+                    Snapshot[itemId] = (Snapshot[itemId] or 0) + select(2, GetContainerItemInfo(i,j)); -- select the 2nd return value (itemcount)
+                end
             end
         end
-    end
-end
-
-function ZLM:FullName(name)
-    -- Sinderion -> Sinderion-ShadowCouncil (add server name to same-server sender);   Xaionics-BlackwaterRaiders -> Xaionics-BlackwaterRaiders (no change if it's already full)
-    ZLM:Debug("FullName - 1 - Name: ".. tostring(name), 1);
-    if type(name) ~= "string" then
+        local keyCount = 0;
+        for _,_ in pairs(Snapshot) do
+            keyCount = keyCount + 1;
+        end
+        return Snapshot;
+    end,
+    __CompareSnapshots = function(self,currentSnapshot,initialSnapshot)
+        ZLM:Debug("Comparing Snapshots: " .. tostring(currentSnapshot) .. " vs " .. tostring(initialSnapshot));
+        local results = {};
+        for k,v in pairs(currentSnapshot) do
+            results[k] = v - (initialSnapshot[k] or 0);
+        end
+        for k,v in pairs(initialSnapshot) do
+            if not currentSnapshot[k] and v > 0 then results[k] = 0 - v; end
+        end
+        return results;
+    end,
+    __GetMailData = function(self)
+        local inbox_items, total_items = GetInboxNumItems();
+        for i = 1, inbox_items do
+            local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
+            textCreated, canReply, isGM = GetInboxHeaderInfo(i);
+            ZLM:Debug("GetNextMailData - Sender: " .. sender);
+            if ZLib:IsStringValid(sender) then
+                sender = ZLib:GetFullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
+            end
+            if hasItem and hasItem > 0 and not not sender then
+                return { index = i, sender = sender };
+            end
+        end
         return nil;
-    end
-    if string.match(name," ") then
-        name = nil;  -- not a character, skip it.
-    elseif string.match(name,"-") then -- Name already full, do nothing :)
-    else
-        name = name .. "-" .. GetRealmName(); -- Name needs some TLC. Might accidentally get NPC's with one name. Oh well lol.
-    end
-    ZLM:Debug("FullName - 2 - Name: ".. tostring(name), 1);
-    return name;
-end
-
-function ZLM:GetInventorySnapshot(flag)
-    local Snapshot = {};
-    for i= 1, 5 do
-        local numberOfSlots = GetContainerNumSlots(i);
-        for j = 1, numberOfSlots do
-            local itemId = GetContainerItemID(i, j);
-            if not not itemId then
-                Snapshot[itemId] = (Snapshot[itemId] or 0) + select(2, GetContainerItemInfo(i,j)); -- select the 2nd return value (itemcount)
+    end,
+    __BeginGetMailItems = function(self)
+        if self.MailWorker == "Available" and ZLM.db.global.Characters[ZLM.CharacterIdentity].RecordDonations then
+            self.MailWorker = "Working";
+            local mailInfo = self:GetNextMailData();
+            if not not mailInfo then
+                self:EmptyLetterContents(mailInfo.index,mailInfo.sender,self:GetInventorySnapshot())
             end
         end
-    end
-    local keyCount = 0;
-    for _,_ in pairs(Snapshot) do
-        keyCount = keyCount + 1;
-    end
-    ZLM:Debug("Getting inventory snapshot. Type: " .. tostring(flag) .. " Keys: " .. tostring(keyCount), 1);
-    return Snapshot;
-end
-
-function ZLM:CompareSnapshots(currentSnapshot,initialSnapshot)
-    ZLM:Debug("Comparing Snapshots: " .. tostring(currentSnapshot) .. " vs " .. tostring(initialSnapshot));
-    local results = {};
-    for k,v in pairs(currentSnapshot) do
-        results[k] = v - (initialSnapshot[k] or 0);
-    end
-    for k,v in pairs(initialSnapshot) do
-        if not currentSnapshot[k] and v > 0 then results[k] = 0 - v; end
-    end
-    return results;
-end
-
-function ZLM:GetNextMailData()
-    local inbox_items, total_items = GetInboxNumItems();
-    for i = 1, inbox_items do
-        local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
-        textCreated, canReply, isGM = GetInboxHeaderInfo(i);
-        ZLM:Debug("GetNextMailData - Sender: " .. sender);
-        if sender then
-            sender = ZLM:FullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
+    end,
+    __EndGetMailItems = function(self,sender,initialSnapshot)
+        ZLM:Debug("Ending Current Mail and calculating differences...",1);
+        ZLM:Debug("Sender: " .. sender .. ", InitialSnapshot: " .. tostring(initialSnapshot));
+        local mailContents = self:CompareSnapshots(self:GetInventorySnapshot(),initialSnapshot);
+        for k,v in pairs(mailContents) do
+            if v > 0 then
+                ZLM:LogDonation(sender,k,v,time());
+            elseif v < 0 then
+                ZLM:Debug("Somehow lost items... ItemId: " ..k .. " Quantity: "..v,3);
+            end
         end
-        if hasItem and hasItem > 0 and not not sender then
-            return { index = i, sender = sender };
+        self.MailWorker = "Available";
+        if ZLM.MailState == "Open" then self:BeginGetMailItems(); end
+    end,
+    __EmptyLetterContents = function(self,mailIndex,sender,snapshot)
+        ZLM:Debug("Beginning EmptyLetterContents - mailIndex: " .. mailIndex .. " snapshot: " .. tostring(snapshot), 1);
+        self.MailSemaphore = ZLib.Semaphore:new(12,self.Semaphore.EmptyLetterContents,self,mailIndex,sender,snapshot);
+        for i = 1,12 do
+            ZLib.Waiter:Wait(i / 10,self.Await.TakeInboxItem,self,mailIndex,i);
         end
-    end
-    return nil;
-end
-
-function ZLM:EmptyLetterContents(mailIndex,sender,snapshot)
-    ZLM:Debug("Beginning EmptyLetterContents - mailIndex: " .. mailIndex .. " snapshot: " .. tostring(snapshot), 1);
-    ZLM.MailSemaphore:renew(12,ZLM_SemaphoreCallback_EmptyLetterContents,mailIndex,sender,snapshot);
-    for i = 1,12 do
-        ZLM:Wait(i / 10,ZLM_WaitFunction_TakeInboxItem,mailIndex,i);
-    end
-    return true;
-end
-
-ZLM_WaitFunction_TakeInboxItem = function(mailIndex,itemIndex)
-    --ZLM:Debug("Taking inbox item " .. itemIndex.. " from letter " .. mailIndex, 1);
-    TakeInboxItem(mailIndex,itemIndex);
-    ZLM.MailSemaphore:Itterate();
-end
-
-ZLM_SemaphoreCallback_EmptyLetterContents = function(self,innerMailIndex,sender,snapshot)
-    ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex) .. "  Snapshot: " .. tostring(snapshot), 1);
-    CheckInbox();
-    ZLM:Wait(0.1,ZLM_WaitFunction_EmptyLetterContents,innerMailIndex,sender,snapshot)
-end
-
-ZLM_WaitFunction_EmptyLetterContents = function(innerMailIndex2,sender,snapshot)
-    local _;
-    ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2) .. " Snapshot: " .. tostring(snapshot), 1);
-    local _, _, newSender , _, _, _, _, itemCount, _, _, _, _, _ = GetInboxHeaderInfo(innerMailIndex2);
-    if not not itemCount and itemCount > 0 and not not newSender and newSender == sender then
-        --ZLM:Debug("Attempting to restart semaphore...",1)
-        ZLM:EmptyLetterContents(innerMailIndex2,sender,snapshot);
-    else
-        ZLM:EndGetMailItems(sender,snapshot);
-    end
-end
-
-function ZLM:BeginGetMailItems()
-    if ZLM.MailWorker == ZLM.MailWorkerStates.Available and ZLM.db.global.Characters[ZLM.CharacterIdentity].RecordDonations then
-        ZLM.MailWorker = ZLM.MailWorkerStates.Working;
-        local mailInfo = self:GetNextMailData();
-        if not not mailInfo then
-            ZLM:EmptyLetterContents(mailInfo.index,mailInfo.sender,self:GetInventorySnapshot("initial"))
+        return true;
+    end,
+    __SemaphoreCallback = {
+        EmptyLetterContents = function(self,me,innerMailIndex,sender,snapshot)
+            ZLM:Debug("Semaphore Callback Triggered! innerMailIndex: "..tostring(innerMailIndex) .. "  Snapshot: " .. tostring(snapshot), 1);
+            CheckInbox();
+            ZLib.Waiter:Wait(0.1,me.Await.EmptyLetterContents,me,innerMailIndex,sender,snapshot)
         end
-    end
-end
-
-function ZLM:EndGetMailItems(sender,initialSnapshot)
-    ZLM:Debug("Ending Current Mail and calculating differences...",1);
-    ZLM:Debug("Sender: " .. sender .. ", InitialSnapshot: " .. tostring(initialSnapshot));
-    local mailContents = ZLM:CompareSnapshots(ZLM:GetInventorySnapshot("current"),initialSnapshot);
-    for k,v in pairs(mailContents) do
-        if v > 0 then
-            ZLM:LogDonation(sender,k,v,time());
-        elseif v < 0 then
-            ZLM:Debug("Somehow lost items... ItemId: " ..k .. " Quantity: "..v,3);
+    },
+    __Await = {
+        TakeInboxItem = function(self,mailIndex,itemIndex)
+            --ZLM:Debug("Taking inbox item " .. itemIndex.. " from letter " .. mailIndex, 1);
+            TakeInboxItem(mailIndex,itemIndex);
+            me.Semaphore:Itterate();
+        end,
+        EmptyLetterContents = function(self,innerMailIndex2,sender,snapshot)
+            ZLM:Debug("Semaphore Callback Wait Return Triggered! innerMailIndex2: "..tostring(innerMailIndex2) .. " Snapshot: " .. tostring(snapshot), 1);
+            local _, _, newSender , _, _, _, _, itemCount, _, _, _, _, _ = GetInboxHeaderInfo(innerMailIndex2);
+            if ZLib:IsNumberValid(itemCount) and ZLib:IsStringValid(newSender) and newSender == sender then
+                self:EmptyLetterContents(innerMailIndex2,sender,snapshot);
+            else
+                self:EndGetMailItems(sender,snapshot);
+            end
         end
-    end
-    ZLM.MailWorker = ZLM.MailWorkerStates.Available;
-    if ZLM.MailState == ZLM.MailStateOptions.Open then ZLM:BeginGetMailItems(); end
-end
+    }
 
+}
+
+ZLM.Mailman = ZLM_Mailman:new();
 ZLM:RegisterEvent("MAIL_SHOW",function()
-    ZLM.MailState = ZLM.MailStateOptions.Open;
+    ZLM.MailState = "Open";
     ZLM:Debug("Getting Mail Items...",3);
-    ZLM:Wait(1,function() ZLM:BeginGetMailItems() end);
+    ZLM:Wait(1,ZLM.Mailman:BeginGetMailItems);
 end)
-
 ZLM:RegisterEvent("MAIL_CLOSED",function()
-    ZLM.MailState = ZLM.MailStateOptions.Closed;
+    ZLM.MailState = "Closed";
     ZLM:Debug("No longer getting mail items.",3);
 end)
 
