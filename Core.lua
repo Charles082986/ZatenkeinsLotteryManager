@@ -192,12 +192,14 @@ function ZLM:OnInitialize()
     self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("ZatenkeinsLotteryManager", "ZLM");
     self:Debug("OptionsFrame added to BlizOptions.",1);
     self:Print("ZLM Loaded");
-    if not self.db.profile.Settings then self.db.profile.Settings = {}; end
-    if not self.db.profile.Bounties then self.db.profile.Bounties = {}; end
-    if not self.db.global.Characters then self.db.global.Characters = {}; end
-    if not self.db.global.Reporting then  self.db.global.Reporting = {}; end
-    if not self.db.global.Reporting.Scoreboard then self.db.global.reporting.Scoreboard = {}; end
-    if not self.db.global.Characters[self.CharacterIdentity] then self.db.global.Characters[self.CharacterIdentity] = {}; end
+    self.db.profile.Settings = self.db.profile.Settings or {}; -- The Settings Profile
+    self.db.profile.Lottery = self.db.profile.Lottery or {}; -- The Lottery Profile
+    self.db.profile.Lottery.Bounties = self.db.profile.Lottery.Bounties or {}; -- Contains a list of all currently accepted bounty items.
+    self.db.global.Characters = self.db.global.Characters or {}; -- Contains a list of all characters on the account and whether or not each character is a designated collector.
+    self.db.global.Reporting = self.db.global.Reporting or {}; -- Contains a roll-up of calculations of donations.
+    self.db.global.Reporting.Scoreboard = self.db.global.Reporting.Scoreboard or {}; -- Contains the currently active Scoreboard.
+    self.db.global.Donations = self.db.global.Dontaions or {}; -- Contains a list of all donations received.
+    self.db.global.Characters[self.CharacterIdentity] = self.db.global.Characters[self.CharacterIdentity] or {};
     self.FrameState = { Scoreboard = ZLM_FrameStateOptions.Hidden, Bountyboard = ZLM_FrameStateOptions.Hidden };
     ZLM:UpdateScoreboard();
     ZLM:Debug("ZLM instantiated.",1);
@@ -263,8 +265,8 @@ function ZLM:GetRecordDonations(_)
     return self.db.global.Characters[self.CharacterIdentity].RecordDonations or false;
 end
 
-function ZLM:RunLottery() -- TO DO: Needs update without params.
-	ZLM:UpdateScoreboard();
+ZLM.RunLottery = function(self)
+	ZLM.Scoreboard.Update(ZLM.db.global.Donations,ZLM.db.profile.Bounties);
 	local lotteryMethod = self.db.profile.Settings.LotteryMethod;
 	local lotteryWinnerCount = self.db.profile.Settings.NumberOfWinners;
 	local winners = {};
@@ -275,7 +277,6 @@ function ZLM:RunLottery() -- TO DO: Needs update without params.
 	end
 	ZLM:AnnounceWinners(winners,lotteryMethod);
 end
-
 function ZLM:GetDonationsWithinTimeframe()
     local time1 = time(self.db.profile.ScoreboardStartDateTimeDatePicker);
     local time2 = time(self.db.profile.ScoreboardEndDateTimeDatePicker);
@@ -289,44 +290,6 @@ function ZLM:GetDonationsWithinTimeframe()
     return output;
 end
 
-ZLM_ScoreboardData = {};
-
-function ZLM:UpdateScoreboard()
-	local donations = ZLM:GetDonationsWithinTimeframe();
-    local pointsTable = {};
-    local hasPoints = false;
-    for _,v in ipairs(ZLM.db.profile.Bounties) do
-        if v.HotItem then
-            pointsTable[v.ItemId] = v.Points * 2;
-        else
-            pointsTable[v.ItemId] = v.Points;
-        end
-        hasPoints = true;
-    end
-    if hasPoints then
-        local tempPoints = {};
-        for _,v in ipairs(donations) do
-            local points = pointsTable[v.ItemId] * v.Quantity;
-            if not not tempPoints[v.Name] then tempPoints[v.Name] = tempPoints[v.Name] + points; else tempPoints[v.Name] = points; end
-        end
-        for k,v in pairs(tempPoints) do
-            tinsert(ZLM_ScoreboardData,{ Name = k, Points = v });
-        end
-        if #(ZLM_ScoreboardData) > 0 then
-            sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
-            local rangeMin = 1;
-            for i,v in ipairs(ZLM_ScoreboardData) do
-                v.Rank = i;
-                v.Min = rangeMin;
-                v.Max = rangeMin + v.Points - 1;
-                if not not ZLM.scoreboard then
-                    ZLM.scoreboard.Table.DataFrame:AddRow(v);
-                end
-                rangeMin = v.Max + 1;
-            end
-        end
-    end
-end
 function ZLM:GetRaffleWinners()
 	local winners = {};
 	if self.db.profile.ExclusiveWinners == nil then self.db.profile.ExclusiveWinners = true; end
@@ -407,40 +370,7 @@ function ZLM:ShowScoreboard()
         end
     else
         ZLM:Debug("Showing Scoreboard.", 1);
-        local scoreboard = ZLM_Scoreboard:new("Zatenkein's Lottery Manager - Scoreboard"
-            ,{ GetWinners = function()
-                ZLM:UpdateScoreboard();
-                ZLM:RunLottery();
-            end,
-            UpdateScoreboard = function()
-                ZLM:UpdateScoreboard();
-            end,
-            DateChanged = function(controlKey,segmentKey,value)
-                ZLM:Debug("Updating DateTime for " .. controlKey .. "DatePicker." .. segmentKey .. " to " .. value .. ".",1)
-                ZLM.db.profile[controlKey .. "DatePicker"][segmentKey] = value;
-                ZLM.db.profile[controlKey] = time(ZLM.db.profile[controlKey .. "DatePicker"]);
-            end,
-            AnnounceScoreboard = function() print("beep boop"); end,
-            AnnounceQuantityChanged = function() local inbox_items, total_items = GetInboxNumItems();
-                for i = 1, inbox_items do
-                    local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned,
-                    textCreated, canReply, isGM = GetInboxHeaderInfo(i);
-                    ZLM:Debug("GetNextMailData - Sender: " .. sender);
-                    if sender then
-                        sender = ZLM:FullName(sender); -- Returns name-server, of whatever you feed it. Nil if there's a space.
-                    end
-                    if hasItem and hasItem > 0 and not not sender then
-                        return { index = i, sender = sender };
-                    end
-                end
-                return nil end},
-            { StartDate = ZLM.db.profile.ScoreboardStartDateTimeDatePicker, EndDate = ZLM.db.profile.ScoreboardEndDateTimeDatePicker, AnnounceQuantity = 5 });
-        table.sort(ZLM_ScoreboardData,ZLM_SortScoreboard);
-        for i,v in ipairs(ZLM_ScoreboardData) do
-            local record = v;
-            record.Rank = i;
-            scoreboard.Table:AddRow(record);
-        end
+        local scoreboard = ZLM_Scoreboard:new();
         ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Shown;
         ZLM.scoreboard = scoreboard;
     end
@@ -458,12 +388,7 @@ function ZLM:ShowBountyboard()
         end
     else
         ZLM:Debug("Showing Bountyboard",1);
-        local bountyBoard = ZLM_Bountyboard:new("Zatenkein's Lottery Manager - Bountyboard", {
-                AddBounty = function()
-                    ZLM.bountyboard:AddRow({ ItemId = nil, ItemLink = "", Points = 0, HotItem = false})
-                end
-            }
-        );
+        local bountyBoard = ZLM_Bountyboard:new();
         ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
         ZLM.bountyboard = bountyBoard;
     end
@@ -479,7 +404,7 @@ function ZLM:ShowLedger()
             ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Hidden;
         end
     else
-        local ledger = ZLM_DonationLedger:new("Zatenkein's Lottery Manager - Donation Ledger");
+        local ledger = ZLM_Ledger:new();
         ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Shown;
         ZLM.ledger = ledger;
     end

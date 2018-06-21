@@ -10,11 +10,16 @@ ZLM_Scoreboard = {
     new = function(self,AceGUI)
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
         local frame = self:__CreateFrame(AceGUI);
+        frame:Hide();
+        frame.DateTimePickerContainer = self:__CreateDateTimePickerContainer(AceGUI);
+        frame:AddChild(frame.DatePickerContainer);
         frame.ButtonContainer = self:__CreateButtonContainer(AceGUI);
         frame:AddChild(frame.ButtonContainer);
         frame.Table =  self:__CreateTable(AceGUI);
         frame:AddChild(frame.Table);
-        frame.AddRow = self:__AddRow;
+        frame.AddRow = self.__AddRow;
+        frame.Update = self.__Update;
+        frame.__GetDonationsWithinTime = self.__GetDonationsWithinTime;
         return frame;
     end,
     __CreateFrame = function(self,AceGUI)
@@ -47,7 +52,7 @@ ZLM_Scoreboard = {
     __CreateSinceLastDrawingButton = function(self,AceGUI)
         return ZLib.Button:new(AceGUI,0.5,"Since Last Drawing",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousWeek });
     end,
-    __CreateDatePickerContainer = function(self,AceGUI)
+    __CreateDateTimePickerContainer = function(self,AceGUI)
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
         local container = AceGUI:Create("SimpleGroup");
         container:SetLayout("Flow");
@@ -128,6 +133,61 @@ ZLM_Scoreboard = {
         if dateObj == nil then dateObj = { year = 2018, month = 1, day = 1, hour = 0, minute = 0, sec = 0}; end
         self.StartDateTimePicker:SetValue(dateObj);
         self.EndDateTimePicker:SetValue(date("*t"));
-    end
+    end,
+    __CalculatePointsTable = function(bounties)
+        local pointsTable = {};
+        for _,v in ipairs(bounties) do
+            if v.HotItem then
+                pointsTable[v.ItemId] = v.Points * 2;
+            else
+                pointsTable[v.ItemId] = v.Points;
+            end
+        end
+        return pointsTable;
+    end,
+    __GetDonationsWithinTime = function(self,aDonations)
+        local iStart = time(self.DateTimePickerContainer.StartDateTimePicker:GetValue());
+        local iEnd = time(self.DateTimPickerContainer.EndDateTimePicker:GetValue());
+        local output = {};
+        for _,v in ipairs(aDonations) do
+            if time(v.Timestamp) >= iStart and time(v.Timestamp) <= iEnd then tinsert(output,v) end
+        end
+        return output;
+    end,
+    __GetWinner = function(self)
+        local roll = math.random()
+    end,
+    __AnnounceScoreboard = function(self,iAnnounceCount)
+
+    end,
+    __Update = function(self,aDonations,aBounties)
+        local tTempPoints = {};
+        local aFilteredDonations = self:__GetDonationsWithinTime(aDonations);
+        local tPoints = ZLM_Scoreboard.__CalculatePointsTable(aBounties);
+        if #tPoints > 0 then
+            for _,v in ipairs(aFilteredDonations) do
+                tTempPoints[v.Name] = (tTempPoints[v.Name] or 0) + (tPoints[v.ItemId] * v.Quantity);
+            end
+            self:FillScoreboard(tTempPoints);
+            self.Lottery Data
+        end
+    end,
+    __FillScoreboard = function(self,tRowSource)
+        local AceGUI = LibStub("AceGUI-3.0");
+        self:ClearScoreboard();
+        local i,min = 0,1;
+        for k,v in tRowSource do
+            i = i + 1;
+            v.Name = k;
+            v.Rank = i;
+            v.Min = min;
+            v.Max = min + v.Points - 1;
+            self:AddRow(AceGUI,v)
+            min = v.Max + 1;
+        end
+    end,
+    __ClearScoreboard = function(self)
+        self.Table:Clear();
+    end,
 };
 ZLM_ScoreboardData = {};
