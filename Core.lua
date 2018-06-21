@@ -54,13 +54,7 @@ ZLM_FrameStateOptions = {
     Hidden = 0;
     Shown = 1;
 };
-function ZLM_SortScoreboard(a,b)
-    if a.Points == b.Points then
-        return a.Name < b.Name --Sort names alphabetically if scores are equal
-    else
-        return a.Points > b.Points; --Sort scores from largest to smallest.
-    end
-end
+
 ZLM = LibStub("AceAddon-3.0"):NewAddon("ZatenkeinsLotteryManager", "AceConsole-3.0", "AceEvent-3.0");
 ZLM_OptionsTable = {
     type = "group",
@@ -201,7 +195,7 @@ function ZLM:OnInitialize()
     self.db.global.Donations = self.db.global.Dontaions or {}; -- Contains a list of all donations received.
     self.db.global.Characters[self.CharacterIdentity] = self.db.global.Characters[self.CharacterIdentity] or {};
     self.FrameState = { Scoreboard = ZLM_FrameStateOptions.Hidden, Bountyboard = ZLM_FrameStateOptions.Hidden };
-    ZLM:UpdateScoreboard();
+    ZLM.Scoreboard = ZLM_Scoreboard:new();
     ZLM:Debug("ZLM instantiated.",1);
 end
 
@@ -265,142 +259,42 @@ function ZLM:GetRecordDonations(_)
     return self.db.global.Characters[self.CharacterIdentity].RecordDonations or false;
 end
 
-ZLM.RunLottery = function(self)
-	ZLM.Scoreboard.Update(ZLM.db.global.Donations,ZLM.db.profile.Bounties);
-	local lotteryMethod = self.db.profile.Settings.LotteryMethod;
-	local lotteryWinnerCount = self.db.profile.Settings.NumberOfWinners;
-	local winners = {};
-	if lotteryMethod == ZLM_LotteryMethod.Competition then
-		winners = self:GetCompetitionWinners(lotteryWinnerCount)
-	elseif lotteryMethod == ZLM_LotteryMethod.Raffle then
-		winners = self:GetRaffleWinners(lotteryWinnerCount);
-	end
-	ZLM:AnnounceWinners(winners,lotteryMethod);
-end
-function ZLM:GetDonationsWithinTimeframe()
-    local time1 = time(self.db.profile.ScoreboardStartDateTimeDatePicker);
-    local time2 = time(self.db.profile.ScoreboardEndDateTimeDatePicker);
-    local output = {};
-    for i = 1,#(self.db.global.Donations),1 do
-        local logItem = self.db.global.Donations[i];
-        if time(logItem.Timestamp) >= time1 and time(logItem.Timestamp) <= time2 then
-            tinsert(output,logItem);
-        end
-    end
-    return output;
-end
 
-function ZLM:GetRaffleWinners()
-	local winners = {};
-	if self.db.profile.ExclusiveWinners == nil then self.db.profile.ExclusiveWinners = true; end
-	while #(winners) < ZLM.db.profile.NumberOfWinners do
-		local roll = math.random(self.db.Global.TotalPoints);
-		local base = 0;
-		for i = 1,#(self.db.Global.Scoreboard) do
-			local ticket = self.db.Global.Scoreboard[i];
-			if roll > base and roll <= (ticket.Points + base) then
-				if (self.db.profile.ExlusiveWInners) or (not self.Contains(winners,"Name",ticket.Name)) or (self.Contains(winners,"Name",ticket.Name) and not self.db.profile.ExclusiveWinners) then
-					tinsert(winners,{ Roll = roll, Name = ticket.Name });
-					break;
-				end
-			end
-		end
-	end
-	return winners;
-end
-function ZLM:GetCompetitionWinners()
-	local winners = {};
-	for i = 1,ZLM.db.profile.NumberOfWinners do
-		tinsert(winners,self.db.global.Scoreboard[i]);
-	end
-	return winners;
-end
-function ZLM:AnnounceWinners(winners)
-	local firstMessage ="The Lottery Winners for -"
-            .. date("%m/%d/%y %H:%M:%S",time(ZLM.db.profile.ScoreboardStartDateTimeDatePicker))
-            .. "- through -"..date("%m/%d/%y %H:%M:%S",time(ZLM.db.profile.ScoreboardEndDateTimeDatePicker)).."- are:";
-		SendChatMessage(firstMessage,ZLM.db.profile.OutputChatType,nil,zlm.db.profile.OutputChatChannel);
-	if ZLM.db.profile.LotteryMethod == ZLM_LotteryManager.LotteryMethod.Competition then
-		local results = ZLM:GetTieResults(winners);
-		for i,v in ipairs(results) do
-			local message = i..": "..v.Name;
-            SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
-        end
-	elseif ZLM.db.profile.LotteryMethod == ZLM_LotteryManager.LotteryMethod.Raffle then
-		for i,v in ipairs(winners) do
-			local message = i..": "..v.Name .. " (Roll: " .. v.Roll .. ")";
-            SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
-		end
-	end
-end
-function ZLM:Contains(table,property,value)
-	for z = 1,#(table) do
-		if table[z][property] == value then return true; end
-	end
-	return false;
-end
-function ZLM:GetTieResults(winners)
-	local pendingResults = {};
-    local sortableResults = {};
-	for _,v in ipairs(winners) do
-        local record = pendingResults[v.Points];
-        if not not record then
-            pendingResults[v.Points] = v.Name;
-        else
-            pendingResults[v.Points] = record .. ", " .. v.Name
-        end
-    end
-    for k,v in pairs(pendingResults) do
-        tinsert(sortableResults,{ Names = v, Points = k})
-    end
-    sort(sortableResults,function(a,b)
-        return a.Points > b.Points
-    end);
-    return sortableResults;
-end
 function ZLM:ShowScoreboard()
-    if not not ZLM.scoreboard then
-        if ZLM.FrameState.Scoreboard == ZLM_FrameStateOptions.Hidden then
-            ZLM.scoreboard:Show();
-            ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Shown;
-            ZLM:UpdateScoreboard();
-        else
-            ZLM.scoreboard:Hide();
-            ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Hidden;
-        end
-    else
-        ZLM:Debug("Showing Scoreboard.", 1);
-        local scoreboard = ZLM_Scoreboard:new();
+    if ZLM.FrameState.Scoreboard == ZLM_FrameStateOptions.Hidden then
+        ZLM.Scoreboard:Show();
         ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Shown;
-        ZLM.scoreboard = scoreboard;
+        ZLM:UpdateScoreboard();
+    else
+        ZLM.Scoreboard:Hide();
+        ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Hidden;
     end
-
 end
 
 function ZLM:ShowBountyboard()
     if not not ZLM.bountyboard then
         if ZLM.FrameState.Bountyboard == ZLM_FrameStateOptions.Hidden then
-            ZLM.bountyboard:Show();
+            ZLM.Bountyboard:Show();
             ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
         else
-            ZLM.bountyboard:Hide();
+            ZLM.Bountyboard:Hide();
             ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Hidden;
         end
     else
         ZLM:Debug("Showing Bountyboard",1);
         local bountyBoard = ZLM_Bountyboard:new();
         ZLM.FrameState.Bountyboard = ZLM_FrameStateOptions.Shown;
-        ZLM.bountyboard = bountyBoard;
+        ZLM.Bountyboard = bountyBoard;
     end
 end
 
 function ZLM:ShowLedger()
     if not not ZLM.ledger then
         if ZLM.FrameState.Ledger == ZLM_FrameStateOptions.Hidden then
-            ZLM.ledger:Show();
+            ZLM.Ledger:Show();
             ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Shown;
         else
-            ZLM.ledger:Hide();
+            ZLM.Ledger:Hide();
             ZLM.FrameState.Ledger = ZLM_FrameStateOptions.Hidden;
         end
     else

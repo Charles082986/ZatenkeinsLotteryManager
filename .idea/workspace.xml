@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="29cf78cd-63c7-43c9-bce4-c26705adefd4" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/ZLM_Lottery.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Core.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Core.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ZLM_Scoreboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/ZLM_Scoreboard.lua" afterDir="false" />
@@ -21,15 +20,14 @@
     <window id="1">
       <content type="file-editors">
         <state>
-          <leaf>
+          <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
             <file leaf-file-name="Core.lua" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/Core.lua">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="231">
-                    <caret line="296" column="59" selection-start-line="296" selection-start-column="48" selection-end-line="296" selection-end-column="59" />
+                  <state relative-caret-position="323">
+                    <caret line="261" selection-start-line="261" selection-end-line="261" />
                     <folding>
                       <element signature="e#101#1147#1" />
-                      <element signature="e#1572#5588#1" />
                     </folding>
                   </state>
                 </provider>
@@ -81,8 +79,8 @@
       <file leaf-file-name="ZLM_Scoreboard.lua" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ZLM_Scoreboard.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="542">
-              <caret line="171" column="29" selection-start-line="171" selection-start-column="29" selection-end-line="171" selection-end-column="29" />
+            <state relative-caret-position="2023">
+              <caret line="194" column="30" lean-forward="true" selection-start-line="194" selection-start-column="30" selection-end-line="194" selection-end-column="30" />
             </state>
           </provider>
         </entry>
@@ -180,6 +178,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -191,7 +190,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -234,7 +232,9 @@
       <workItem from="1527677018177" duration="5319000" />
       <workItem from="1527705213264" duration="1585000" />
       <workItem from="1529329120935" duration="19598000" />
-      <workItem from="1529589687078" duration="5085000" />
+      <workItem from="1529589687078" duration="5132000" />
+      <workItem from="1529595310181" duration="511000" />
+      <workItem from="1529596077442" duration="7157000" />
     </task>
     <task id="LOCAL-00001" summary="Converted to ZLib">
       <created>1529345754193</created>
@@ -257,11 +257,18 @@
       <option name="project" value="LOCAL" />
       <updated>1529348889657</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Converted to ZLib">
+      <created>1529595234761</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1529595234762</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="109928000" />
+    <option name="totallyTimeSpent" value="117643000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-3848" y="-8" width="1936" height="1056" extended-state="6" />
@@ -282,11 +289,11 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="bottom" id="Messages" order="7" visible="true" weight="0.1530287" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="File Transfer" order="10" visible="true" weight="0.3282365" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32943678" />
-      <window_info anchor="bottom" id="Messages" order="7" visible="true" weight="0.1530287" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -583,10 +590,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-395">
           <caret line="1" selection-start-line="1" selection-end-line="1" />
-          <folding>
-            <element signature="e#180#260#1" />
-            <element signature="e#295#1526#1" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -609,19 +612,18 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Core.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="296" column="59" selection-start-line="296" selection-start-column="48" selection-end-line="296" selection-end-column="59" />
+        <state relative-caret-position="323">
+          <caret line="261" selection-start-line="261" selection-end-line="261" />
           <folding>
             <element signature="e#101#1147#1" />
-            <element signature="e#1572#5588#1" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_Scoreboard.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="542">
-          <caret line="171" column="29" selection-start-line="171" selection-start-column="29" selection-end-line="171" selection-end-column="29" />
+        <state relative-caret-position="2023">
+          <caret line="194" column="30" lean-forward="true" selection-start-line="194" selection-start-column="30" selection-end-line="194" selection-end-column="30" />
         </state>
       </provider>
     </entry>

@@ -20,6 +20,10 @@ ZLM_Scoreboard = {
         frame.AddRow = self.__AddRow;
         frame.Update = self.__Update;
         frame.__GetDonationsWithinTime = self.__GetDonationsWithinTime;
+        frame.GetRankingByRank = self.__GetRankingByRank;
+        frame.GetRankingByName = self.__GetRankingByName;
+        frame.Rankings = {};
+        frame.Update(ZLM.db.profile.Lottery.Bounties,ZLM.db.global.Donations);
         return frame;
     end,
     __CreateFrame = function(self,AceGUI)
@@ -155,39 +159,68 @@ ZLM_Scoreboard = {
         return output;
     end,
     __GetWinner = function(self)
-        local roll = math.random()
+        local roll = math.random(self.MaximuMPoints);
+        for _,v in ipairs(self.Rankings) do
+            if roll >= v.Min and roll <= v.Max then self:AnnounceWinner(roll,v); break; end;
+        end
     end,
-    __AnnounceScoreboard = function(self,iAnnounceCount)
-
+    __AnnounceWinner = function(self,roll,winner)
+        local firstMessage ="The Lottery Winners for -"
+                .. date("%Y-%m-%d %H:%M:%S",time(self.DateTimePickerContainer.StartDateTimePicker:GetValue()))
+                .. "- through -"..date("%Y-%m-%d %H:%M:%S",time()).."- are:";
+        SendChatMessage(firstMessage,ZLM.db.profile.OutputChatType,nil,zlm.db.profile.OutputChatChannel);
+        local message = v.Name .. " (Roll: " .. roll .. " Range: " .. v.Min .. " - " .. v.Max .. ")";
+        SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
     end,
     __Update = function(self,aDonations,aBounties)
         local tTempPoints = {};
+        self.Rankings = {};
         local aFilteredDonations = self:__GetDonationsWithinTime(aDonations);
         local tPoints = ZLM_Scoreboard.__CalculatePointsTable(aBounties);
         if #tPoints > 0 then
             for _,v in ipairs(aFilteredDonations) do
                 tTempPoints[v.Name] = (tTempPoints[v.Name] or 0) + (tPoints[v.ItemId] * v.Quantity);
             end
-            self:FillScoreboard(tTempPoints);
-            self.Lottery Data
+            for _,v in pairs(tTempPoints) do
+                tinsert(self.Rankings,v);
+            end
+            sort(self.Rankings,ZLM_Scoreboard.__SortRankings);
+            self:FillScoreboard();
         end
     end,
-    __FillScoreboard = function(self,tRowSource)
+    __FillScoreboard = function(self)
         local AceGUI = LibStub("AceGUI-3.0");
+        self.MaximumPoints = 0;
         self:ClearScoreboard();
-        local i,min = 0,1;
-        for k,v in tRowSource do
+        local i,lastMax = 0,0;
+        for k,v in self.Rankings do
             i = i + 1;
             v.Name = k;
             v.Rank = i;
-            v.Min = min;
-            v.Max = min + v.Points - 1;
-            self:AddRow(AceGUI,v)
-            min = v.Max + 1;
+            v.Min = lastMax + 1;
+            v.Max = lastMax + v.Points;
+            lastMax = v.Max;
         end
+        self.MaximumPoints = lastMax;
+        for _,v in ipairs(self.Rankings) do self:AddRow(AceGUI,v) end
     end,
     __ClearScoreboard = function(self)
         self.Table:Clear();
+        self.Rankings = {};
     end,
+    __SortRankings = function(a,b)
+        if a.Points == b.Points then
+            return a.Name < b.Name --Sort names alphabetically if scores are equal
+        else
+            return a.Points > b.Points; --Sort scores from largest to smallest.
+        end
+    end,
+    __GetRankingByName = function(self,sName)
+        sName = ZLib:GetFullName(sName);
+        return ZLib:GetMatch(self.Rankings,sName,"Name");
+    end,
+    __GetRankingByRank = function(self,iRank)
+        return self.Rankings[iRank];
+    end;
 };
 ZLM_ScoreboardData = {};
