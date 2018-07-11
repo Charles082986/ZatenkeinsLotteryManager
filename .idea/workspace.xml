@@ -3,8 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="29cf78cd-63c7-43c9-bce4-c26705adefd4" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Core.lua" beforeDir="false" afterPath="$PROJECT_DIR$/Core.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ZLM_Scoreboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/ZLM_Scoreboard.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ZLM_Bountyboard.lua" beforeDir="false" afterPath="$PROJECT_DIR$/ZLM_Bountyboard.lua" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -15,28 +14,6 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="DockManager">
-    <window id="1">
-      <content type="file-editors">
-        <state>
-          <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-            <file leaf-file-name="Core.lua" pinned="false" current-in-tab="true">
-              <entry file="file://$PROJECT_DIR$/Core.lua">
-                <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="323">
-                    <caret line="261" selection-start-line="261" selection-end-line="261" />
-                    <folding>
-                      <element signature="e#101#1147#1" />
-                    </folding>
-                  </state>
-                </provider>
-              </entry>
-            </file>
-          </leaf>
-        </state>
-      </content>
-    </window>
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
@@ -49,7 +26,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="embeds.xml" pinned="false" current-in-tab="false">
+      <file leaf-file-name="embeds.xml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/embeds.xml">
           <provider selected="true" editor-type-id="text-editor">
             <state>
@@ -61,8 +38,8 @@
       <file leaf-file-name="ZLM_Bountyboard.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ZLM_Bountyboard.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2754">
-              <caret line="162" selection-start-line="162" selection-end-line="162" />
+            <state relative-caret-position="1003">
+              <caret line="131" column="50" lean-forward="true" selection-start-line="131" selection-start-column="50" selection-end-line="131" selection-end-column="50" />
             </state>
           </provider>
         </entry>
@@ -76,11 +53,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ZLM_Scoreboard.lua" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ZLM_Scoreboard.lua" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ZLM_Scoreboard.lua">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2023">
-              <caret line="194" column="30" lean-forward="true" selection-start-line="194" selection-start-column="30" selection-end-line="194" selection-end-column="30" />
+            <state relative-caret-position="561">
+              <caret line="33" column="21" lean-forward="true" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -150,11 +127,11 @@
         <option value="$PROJECT_DIR$/ZLM_MailReader.lua" />
         <option value="$PROJECT_DIR$/ZatenkeinsLotteryManager.toc" />
         <option value="$PROJECT_DIR$/embeds.xml" />
-        <option value="$PROJECT_DIR$/ZLM_Bountyboard.lua" />
         <option value="$PROJECT_DIR$/ZLM_DonationLedger.lua" />
         <option value="$PROJECT_DIR$/ZLM_Lottery.lua" />
         <option value="$PROJECT_DIR$/Core.lua" />
         <option value="$PROJECT_DIR$/ZLM_Scoreboard.lua" />
+        <option value="$PROJECT_DIR$/ZLM_Bountyboard.lua" />
       </list>
     </option>
   </component>
@@ -168,10 +145,10 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-3848" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
+    <option name="x" value="-2068" />
+    <option name="y" value="402" />
+    <option name="width" value="1937" />
+    <option name="height" value="1057" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -234,7 +211,8 @@
       <workItem from="1529329120935" duration="19598000" />
       <workItem from="1529589687078" duration="5132000" />
       <workItem from="1529595310181" duration="511000" />
-      <workItem from="1529596077442" duration="7157000" />
+      <workItem from="1529596077442" duration="7371000" />
+      <workItem from="1529941816756" duration="2911000" />
     </task>
     <task id="LOCAL-00001" summary="Converted to ZLib">
       <created>1529345754193</created>
@@ -264,14 +242,21 @@
       <option name="project" value="LOCAL" />
       <updated>1529595234762</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Converted to ZLib">
+      <created>1529604695112</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1529604695113</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="117643000" />
+    <option name="totallyTimeSpent" value="120768000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-3848" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-3848" y="-8" width="1936" height="1056" extended-state="7" />
     <layout>
       <window_info anchor="right" id="Remote Host" order="3" />
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
@@ -565,13 +550,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_Table.lua" />
-    <entry file="file://$PROJECT_DIR$/embeds.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="150" selection-start-column="150" selection-end-column="150" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_MailReader.lua">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2159">
@@ -600,13 +578,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ZLM_Bountyboard.lua">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2754">
-          <caret line="162" selection-start-line="162" selection-end-line="162" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_Lottery.lua">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -620,10 +591,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ZLM_Bountyboard.lua">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1003">
+          <caret line="131" column="50" lean-forward="true" selection-start-line="131" selection-start-column="50" selection-end-line="131" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ZLM_Scoreboard.lua">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2023">
-          <caret line="194" column="30" lean-forward="true" selection-start-line="194" selection-start-column="30" selection-end-line="194" selection-end-column="30" />
+        <state relative-caret-position="561">
+          <caret line="33" column="21" lean-forward="true" selection-start-line="33" selection-start-column="21" selection-end-line="33" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/embeds.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="150" selection-start-column="150" selection-end-column="150" />
         </state>
       </provider>
     </entry>

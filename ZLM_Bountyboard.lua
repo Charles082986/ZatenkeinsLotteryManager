@@ -83,7 +83,7 @@ ZLM_Bountyboard = {
         if not not text then
             ZLM:Debug("ItemId Changed - " .. text);
             local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(text);
-            ZLM:Wait(
+            ZLib:Wait(
                 0.25
                 ,ZLM_Bountyboard.__Await.ItemIdChangeCallback
                 ,text
@@ -94,7 +94,7 @@ ZLM_Bountyboard = {
     end,
     __Await = {
         ItemIdChangeCallback = function(text,itemLink,me)
-            ZLM:Debug("ItemId Changed - Wait Function - " .. text .. " - " .. itemLink);
+            ZLib:Debug("ItemId Changed - Wait Function - " .. text .. " - " .. itemLink);
             local index = -1;
             for i,v in ipairs(ZLM.db.profile.Bounties) do
                 if v.ItemId == text then index = i; break; end
@@ -128,7 +128,7 @@ ZLM_Bountyboard = {
             end
         end
     end,
-    __HotItemChangeCallback = function(me_,value)
+    __HotItemChangeCallback = function(me,_,value)
         local itemId = me.parent.children[1].GetText();
         if not not itemId then
             for i,v in ipairs(ZLM.db.profile.Bounties) do
