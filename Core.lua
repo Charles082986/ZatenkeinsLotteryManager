@@ -187,13 +187,18 @@ function ZLM:OnInitialize()
     self:Debug("OptionsFrame added to BlizOptions.",1);
     self:Print("ZLM Loaded");
     self.db.profile.Settings = self.db.profile.Settings or {}; -- The Settings Profile
+    self:Print('ZLM Settings initialized.');
     self.db.profile.Lottery = self.db.profile.Lottery or {}; -- The Lottery Profile
     self.db.profile.Lottery.Bounties = self.db.profile.Lottery.Bounties or {}; -- Contains a list of all currently accepted bounty items.
+    self:Print('ZLM Lottery initialized.');
     self.db.global.Characters = self.db.global.Characters or {}; -- Contains a list of all characters on the account and whether or not each character is a designated collector.
+    self.db.global.Characters[self.CharacterIdentity] = self.db.global.Characters[self.CharacterIdentity] or {};
+    self:Print('ZLM Characters initialized.');
     self.db.global.Reporting = self.db.global.Reporting or {}; -- Contains a roll-up of calculations of donations.
     self.db.global.Reporting.Scoreboard = self.db.global.Reporting.Scoreboard or {}; -- Contains the currently active Scoreboard.
+    self:Print('ZLM Reporting initialized.');
     self.db.global.Donations = self.db.global.Dontaions or {}; -- Contains a list of all donations received.
-    self.db.global.Characters[self.CharacterIdentity] = self.db.global.Characters[self.CharacterIdentity] or {};
+    self:Print('ZLM Donations initialized.');
     self.FrameState = { Scoreboard = ZLM_FrameStateOptions.Hidden, Bountyboard = ZLM_FrameStateOptions.Hidden };
     ZLM.Scoreboard = ZLM_Scoreboard:new();
     ZLM:Debug("ZLM instantiated.",1);

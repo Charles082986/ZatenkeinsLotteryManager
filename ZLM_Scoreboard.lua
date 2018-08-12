@@ -11,19 +11,28 @@ ZLM_Scoreboard = {
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
         local frame = self:__CreateFrame(AceGUI);
         frame:Hide();
+        ZLib.Debug:Print('Scoreboard Created');
         frame.DateTimePickerContainer = self:__CreateDateTimePickerContainer(AceGUI);
         frame:AddChild(frame.DatePickerContainer);
+        ZLib.Debug.IsDev = true;
+        ZLib.Debug:Print('DTPs created.');
         frame.ButtonContainer = self:__CreateButtonContainer(AceGUI);
         frame:AddChild(frame.ButtonContainer);
+        ZLIb.Debug:Print('Buttons created.');
         frame.Table =  self:__CreateTable(AceGUI);
         frame:AddChild(frame.Table);
         frame.AddRow = self.__AddRow;
         frame.Update = self.__Update;
+        ZLIb.Debug:Print('Table Created.');
         frame.__GetDonationsWithinTime = self.__GetDonationsWithinTime;
         frame.GetRankingByRank = self.__GetRankingByRank;
         frame.GetRankingByName = self.__GetRankingByName;
+        ZLIb.Debug:Print('Functions initialized.');
         frame.Rankings = {};
+        ZLIb.Debug:Print('Update started.');
         frame.Update(ZLM.db.profile.Lottery.Bounties,ZLM.db.global.Donations);
+        ZLIb.Debug:Print('Update completed.');
+        ZLib.Debug.IsDev = false;
         return frame;
     end,
     __CreateFrame = function(self,AceGUI)
@@ -57,14 +66,23 @@ ZLM_Scoreboard = {
         return ZLib.Button:new(AceGUI,0.5,"Since Last Drawing",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousWeek });
     end,
     __CreateDateTimePickerContainer = function(self,AceGUI)
+        ZLib.Debug:Print('Creating DTPs');
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+        ZLib.Debug:Print('Creating SimpleGroup');
         local container = AceGUI:Create("SimpleGroup");
+        ZLib.Debug:Print('Setting Layout to Flow');
         container:SetLayout("Flow");
-        container:RelativeWidth(0.65);
+        ZLib.Debug:Print('Setting Relative Width to 65%');
+        container:SetRelativeWidth(0.65);
+        ZLib.Debug:Print('Begin Creating DateTimePickers');
         container.StartDateTimePicker = ZLib.DateTimePicker:new(AceGUI,1,{ Multiline = true, DefaultValue = ZLM.db.global.Reporting.Scoreboard.StartDateTime },{ OnValueChanged = self.__StartDateTimeChangedCallback });
+        ZLib.Debug:Print('Start DTP Created.');
         container.EndDateTimePicker = ZLib.DateTimePicker:new(AceGUI,1,{ Multiline = true, DefaultValue = ZLM.db.global.Reporting.Scoreboard.EndDateTime },{ OnValueChanged = self.__EndDateTimeChangedCallback });
+        ZLib.Debug:Print('End DTP Created.');
+        ZLib.Debug:Print('End Creating DateTimePickers.');
         container:AddChild(container.StartDateTimePicker);
         container:AddChild(container.EndDateTimePicker);
+        ZLib.Debug:Print('DTPs Completed.');
         return container;
     end,
     __CreateTable = function(self,AceGUI)
