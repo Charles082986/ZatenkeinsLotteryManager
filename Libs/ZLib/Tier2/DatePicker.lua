@@ -88,7 +88,7 @@ ZLib.DatePicker = {
         ZLib.Debug:Print('Setting OVC Callback');
         oCallbacks.OnValueChanged = function(me,_,key,checked) callback("year",key); end;
         ZLib.Debug:Print('Instantiating Years Dropdown');
-        return ZLib.Dropdown:new(AceGUI,0.45,oOptions,oCallbacks);
+        return ZLib.Dropdown:new(AceGUI,0.40,oOptions,oCallbacks);
     end,
     __CreateMonthsDropdown = function(self,AceGUI,iDefaultMonth,callback)
         local oOptions = {};
@@ -96,7 +96,7 @@ ZLib.DatePicker = {
         oOptions.Values = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC" }
         oOptions.DefaultValue = iDefaultMonth;
         oCallbacks.OnValueChanged = function(me,_,key,checked) callback("month",key); end;
-        return ZLib.Dropdown:new(AceGUI,0.35,oOptions,oCallbacks);
+        return ZLib.Dropdown:new(AceGUI,0.30,oOptions,oCallbacks);
     end,
     __CreateDaysDropdown = function(self,AceGUI,iDefaultDay,callback)
         local oOptions = {};
@@ -104,7 +104,7 @@ ZLib.DatePicker = {
         oOptions.Values = ZLib:CreateIntegerList(1,31);
         oOptions.DefaultValue = iDefaultDay;
         oCallbacks.OnValueChanged = function(me,_,key,checked) callback("day",key); end;
-        return ZLib.Dropdown:new(AceGUI,0.25,oOptions,oCallbacks);
+        return ZLib.Dropdown:new(AceGUI,0.30,oOptions,oCallbacks);
     end,
 };
 ZLib.Controls["DatePicker"] = ZLib.DatePicker;

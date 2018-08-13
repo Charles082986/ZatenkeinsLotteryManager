@@ -269,7 +269,7 @@ function ZLM:ShowScoreboard()
     if ZLM.FrameState.Scoreboard == ZLM_FrameStateOptions.Hidden then
         ZLM.Scoreboard:Show();
         ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Shown;
-        ZLM:UpdateScoreboard();
+        ZLM.Scoreboard:Update();
     else
         ZLM.Scoreboard:Hide();
         ZLM.FrameState.Scoreboard = ZLM_FrameStateOptions.Hidden;

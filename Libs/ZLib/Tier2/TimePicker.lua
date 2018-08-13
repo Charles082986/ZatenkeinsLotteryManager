@@ -63,7 +63,7 @@ ZLib.TimePicker = {
         oOptions.Values = ZLib:CreateIntegerList(0,23);
         oOptions.DefaultValue = iDefaultValue;
         oCallbacks.OnValueChanged = function(me,_,key,checked) callback("hour",key); end;
-        return ZLib.Dropdown:new(AceGUI,0.45,oOptions,oCallbacks);
+        return ZLib.Dropdown:new(AceGUI,0.33,oOptions,oCallbacks);
     end,
     __CreateMinsDropdown = function(self,AceGUI,iDefaultValue,callback)
         local oOptions = {};
@@ -71,7 +71,7 @@ ZLib.TimePicker = {
         oOptions.Values = ZLib:CreateIntegerList(0,59);
         oOptions.DefaultValue = iDefaultValue;
         oCallbacks.OnValueChanged = function(me,_,key,checked) callback("min",key); end;
-        return ZLib.Dropdown:new(AceGUI,0.45,oOptions,oCallbacks);
+        return ZLib.Dropdown:new(AceGUI,0.34,oOptions,oCallbacks);
     end,
     __CreateSecsDropdown = function(self,AceGUI,iDefaultValue,callback)
         local oOptions = {};
@@ -79,7 +79,7 @@ ZLib.TimePicker = {
         oOptions.Values = ZLib:CreateIntegerList(0,59);
         oOptions.DefaultValue = iDefaultValue;
         oCallbacks.OnValueChanged = function(me,_,key,checked) callback("sec",key); end;
-        return ZLib.Dropdown:new(AceGUI,0.45,oOptions,oCallbacks);
+        return ZLib.Dropdown:new(AceGUI,0.33,oOptions,oCallbacks);
     end,
     __ValidateOptions = function(self,oOptions)
         ZLib.Debug:Print('Validating Options: '.. tostring(oOptions));

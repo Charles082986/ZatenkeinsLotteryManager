@@ -1,16 +1,24 @@
 ZLib.Table = {
     new = function(self,AceGUI,dWidth,oTableStructure,oOptions)
+        ZLib.Debug:Print('Creating ZLib.Table');
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
+        ZLib.Debug:Print('Creating Table Frame.');
         local root = AceGUI:Create("SimpleGroup");
-        root.SetRelativeWidth(dWidth);
-        root.SetLayout("Flow");
+        root:SetRelativeWidth(dWidth);
+        root:SetLayout("Flow");
+        ZLib.Debug:Print('Creating Header Row.');
         root.Header = self:__BuildHeaderRow(AceGUI,oTableStructure);
-        root.Data = self:__BuildTableData(self,AceGUI,oTableStructure);
+        ZLib.Debug:Print('Creating Table Data.');
+        root.Data = self:__BuildTableData(AceGUI,oTableStructure);
+        ZLib.Debug:Print('Creating Add Row Function.');
         root.AddRow = self:__BuildAddRowFunction();
-        root.RemoveRow = self:__BuidlRemoveRowFunction();
+        ZLib.Debug:Print('Creating Remove Row Function.');
+        root.RemoveRow = self:__BuildRemoveRowFunction();
+        ZLib.Debug:Print('Add/Remove Row Functions Built.');
         root:AddChild(root.Header);
         root:AddChild(root.Data);
         root.Clear = self.__Clear;
+        ZLib.Debug:Print('ZLib.Table created.')
         return root;
     end,
     __BuildCell = function(self,AceGUI,type,oCellOptions)
@@ -73,8 +81,10 @@ ZLib.Table = {
         data:SetRelativeWidth(1);
         data:SetFullHeight(true);
         data:SetLayout("Flow");
+        ZLib.Debug:Print('Building Table Scroll Container.');
         data.ScrollContainer = self:__BuildScrollContainer(AceGUI);
         data:AddChild(data.ScrollContainer);
+        ZLib.Debug:Print('Table data built.');
         return data;
     end,
     __BuildScrollContainer = function(self,AceGUI)
@@ -82,10 +92,12 @@ ZLib.Table = {
         local scroll = AceGUI:Create("ScrollFrame");
         scroll:SetLayout("List");
         scroll:SetFullWidth(true);
-        scroll:SetFulLHeight(true);
+        scroll:SetFullHeight(true);
+        ZLib.Debug:Print('Building Table Row Container.');
         local rows = self:__BuildRowContainer(AceGUI);
         scroll:AddChild(rows);
         scroll.RowsContainer = rows;
+        ZLib.Debug:Print('Scroll Container Built.');
         return scroll;
     end,
     __BuildRowContainer = function(self,AceGUI)

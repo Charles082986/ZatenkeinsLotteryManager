@@ -13,26 +13,27 @@ ZLM_Scoreboard = {
         frame:Hide();
         ZLib.Debug:Print('Scoreboard Created');
         frame.DateTimePickerContainer = self:__CreateDateTimePickerContainer(AceGUI);
-        frame:AddChild(frame.DatePickerContainer);
-        ZLib.Debug.IsDev = true;
-        ZLib.Debug:Print('DTPs created.');
+        frame:AddChild(frame.DateTimePickerContainer);
+        ZLib.Debug:Print('Begin Create Button Container.');
         frame.ButtonContainer = self:__CreateButtonContainer(AceGUI);
         frame:AddChild(frame.ButtonContainer);
-        ZLIb.Debug:Print('Buttons created.');
+        ZLib.Debug:Print('Begin Create Scoreboard Table.');
         frame.Table =  self:__CreateTable(AceGUI);
         frame:AddChild(frame.Table);
+        ZLib.Debug:Print('Assigning AddRow and Update functions.');
         frame.AddRow = self.__AddRow;
         frame.Update = self.__Update;
-        ZLIb.Debug:Print('Table Created.');
-        frame.__GetDonationsWithinTime = self.__GetDonationsWithinTime;
+        ZLib.Debug:Print('Setting GetDonationsWithinTime Handler.');
+        frame.GetDonationsWithinTime = self.__GetDonationsWithinTime;
+        ZLib.Debug:Print('Setting GetRankingByRank Handler.');
         frame.GetRankingByRank = self.__GetRankingByRank;
+        ZLib.Debug:Print('Setting GetRankingByName Handler.');
         frame.GetRankingByName = self.__GetRankingByName;
-        ZLIb.Debug:Print('Functions initialized.');
+        ZLib.Debug:Print('Functions initialized.');
         frame.Rankings = {};
-        ZLIb.Debug:Print('Update started.');
-        frame.Update(ZLM.db.profile.Lottery.Bounties,ZLM.db.global.Donations);
-        ZLIb.Debug:Print('Update completed.');
-        ZLib.Debug.IsDev = false;
+        ZLib.Debug:Print('Update started.');
+        frame:Update();
+        ZLib.Debug:Print('Update completed.');
         return frame;
     end,
     __CreateFrame = function(self,AceGUI)
@@ -43,27 +44,34 @@ ZLM_Scoreboard = {
         return frame;
     end,
     __CreateButtonContainer = function(self,AceGUI)
+        ZLib.Debug:Print('Creating Scoreboard Buttons Container.');
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
         local container = AceGUI:Create("SimpleGroup");
         container:SetLayout("Flow");
         container:SetRelativeWidth(0.35);
+        ZLib.Debug:Print('Creating buttons for scoreboard.');
+        container:AddChild(ZLib.Heading:new(AceGUI,1,'Presets'))
         container:AddChild(self.__CreatePreviousWeekButton(AceGUI));
         container:AddChild(self.__CreateLastFourWeeksButton(AceGUI));
         container:AddChild(self.__CreatePreviousMonthButton(AceGUI));
         container:AddChild(self.__CreateSinceLastDrawingButton(AceGUI));
+        ZLib.Debug:Print('Buttons Container Created.');
         return container;
     end,
     __CreatePreviousMonthButton = function(self,AceGUI)
-        return ZLib.Button:new(AceGUI,0.5,"Previous Month",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousMonth });
+        return ZLib.Button:new(AceGUI,1,"Previous Month",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousMonth });
     end,
     __CreateLastFourWeeksButton = function(self,AceGUI)
-        return ZLib.Button:new(AceGUI,0.5,"Last 28 Days",{ OnClick = ZLM_Scoreboard.__SetDatePickersToLastFourWeeks });
+        return ZLib.Button:new(AceGUI,1,"Last 28 Days",{ OnClick = ZLM_Scoreboard.__SetDatePickersToLastFourWeeks });
     end,
     __CreatePreviousWeekButton = function(self,AceGUI)
-        return ZLib.Button:new(AceGUI,0.5,"Previous Week",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousWeek });
+        return ZLib.Button:new(AceGUI,1,"Previous Week",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousWeek });
     end,
     __CreateSinceLastDrawingButton = function(self,AceGUI)
-        return ZLib.Button:new(AceGUI,0.5,"Since Last Drawing",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousWeek });
+        return ZLib.Button:new(AceGUI,1,"Since Last Drawing",{ OnClick = ZLM_Scoreboard.__SetDatePickersToPreviousWeek });
+    end,
+    __CreateUpdateButton = function(self,AceGUI)
+        return ZLib.Button:new(AceGUI,1,'Use Set Start/Stop Times', { OnClick = function() self:Update() end})
     end,
     __CreateDateTimePickerContainer = function(self,AceGUI)
         ZLib.Debug:Print('Creating DTPs');
@@ -73,21 +81,25 @@ ZLM_Scoreboard = {
         ZLib.Debug:Print('Setting Layout to Flow');
         container:SetLayout("Flow");
         ZLib.Debug:Print('Setting Relative Width to 65%');
-        container:SetRelativeWidth(0.65);
+        container:SetRelativeWidth(0.40);
         ZLib.Debug:Print('Begin Creating DateTimePickers');
         container.StartDateTimePicker = ZLib.DateTimePicker:new(AceGUI,1,{ Multiline = true, DefaultValue = ZLM.db.global.Reporting.Scoreboard.StartDateTime },{ OnValueChanged = self.__StartDateTimeChangedCallback });
         ZLib.Debug:Print('Start DTP Created.');
         container.EndDateTimePicker = ZLib.DateTimePicker:new(AceGUI,1,{ Multiline = true, DefaultValue = ZLM.db.global.Reporting.Scoreboard.EndDateTime },{ OnValueChanged = self.__EndDateTimeChangedCallback });
         ZLib.Debug:Print('End DTP Created.');
         ZLib.Debug:Print('End Creating DateTimePickers.');
+        ZLib.Debug.IsDev = true;
+        container:AddChild(ZLib.Heading:new(AceGUI,1,'Lottery Start'));
         container:AddChild(container.StartDateTimePicker);
+        container:AddChild(ZLib.Heading:new(AceGUI,1,'Lottery End'));
         container:AddChild(container.EndDateTimePicker);
+        ZLib.Debug.IsDev = false;
         ZLib.Debug:Print('DTPs Completed.');
         return container;
     end,
     __CreateTable = function(self,AceGUI)
         if not AceGUI then AceGUI = LibStub("AceGUI-3.0"); end
-        return ZLib.Table:new(AceGUI,1,self.StructureArray)
+        return ZLib.Table:new(AceGUI,1,self.StructureArray);
     end,
     __StartDateTimeChangedCallback = function(picker,dtObject,key,value,error)
         if ZLib:IsStringValid(error) then ZLM:Debug(error,4); return false; end
@@ -124,6 +136,7 @@ ZLM_Scoreboard = {
         self.Table:AddRow(AceGUI,rowObj);
     end,
     __SetDatePickersToPreviousMonth = function(self)
+        -- TO DO: Refactor these buttons to be object-oriented with an instanced self context.
         local daysInMonth = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
         local d = date("*t");
         d.month = d.month -1;
@@ -132,12 +145,12 @@ ZLM_Scoreboard = {
         d.hour = 0;
         d.minute = 0;
         d.sec = 0;
-        self.StartDatePicker:SetValue(d);
+        self.DateTimePickerContainer.StartDateTimePicker:SetValue(d);
         d.day = daysInMonth[d.month];
         d.hour = 23;
         d.minute = 59;
         d.sec = 59;
-        self.EndDatePicker:SetValue(d)
+        self.DateTimePickerContainer.EndDateTimePicker:SetValue(d);
     end,
     __SetDatePickersToLastFourWeeks = function(self)
         self.StartDateTimePicker:SetDatePast({ day = 28, DayState = 0});
@@ -157,24 +170,34 @@ ZLM_Scoreboard = {
         self.EndDateTimePicker:SetValue(date("*t"));
     end,
     __CalculatePointsTable = function(bounties)
-        local pointsTable = {};
-        for _,v in ipairs(bounties) do
-            if v.HotItem then
-                pointsTable[v.ItemId] = v.Points * 2;
-            else
-                pointsTable[v.ItemId] = v.Points;
+        if(not not bounties and #bounties > 0) then
+            local pointsTable = {};
+            for _,v in ipairs(bounties) do
+                if v.HotItem then
+                    pointsTable[v.ItemId] = v.Points * 2;
+                else
+                    pointsTable[v.ItemId] = v.Points;
+                end
             end
+            return pointsTable;
+        else
+            return nil;
         end
-        return pointsTable;
     end,
     __GetDonationsWithinTime = function(self,aDonations)
+        ZLib.Debug:Print('Getting StartDateTimePicker Value.');
         local iStart = time(self.DateTimePickerContainer.StartDateTimePicker:GetValue());
-        local iEnd = time(self.DateTimPickerContainer.EndDateTimePicker:GetValue());
-        local output = {};
-        for _,v in ipairs(aDonations) do
-            if time(v.Timestamp) >= iStart and time(v.Timestamp) <= iEnd then tinsert(output,v) end
+        ZLib.Debug:Print('Getting EndDateTimePicker Value.');
+        local iEnd = time(self.DateTimePickerContainer.EndDateTimePicker:GetValue());
+        ZLib.Debug:Print('Filtering by time.');
+        if(not not aDonations and #aDonations > 0) then
+            local output = {};
+            for _,v in ipairs(aDonations) do
+                if time(v.Timestamp) >= iStart and time(v.Timestamp) <= iEnd then tinsert(output,v) end
+            end
+            return output;
         end
-        return output;
+        return nil;
     end,
     __GetWinner = function(self)
         local roll = math.random(self.MaximuMPoints);
@@ -190,12 +213,16 @@ ZLM_Scoreboard = {
         local message = v.Name .. " (Roll: " .. roll .. " Range: " .. v.Min .. " - " .. v.Max .. ")";
         SendChatMessage(message,ZLM.db.profile.OutputChatType,nil,ZLM.db.profile.OutputChatChannel);
     end,
-    __Update = function(self,aDonations,aBounties)
+    __Update = function(self)
+        local aBounties = ZLM.db.profile.Lottery.Bounties;
+        local aDonations = ZLM.db.global.Donations;
         local tTempPoints = {};
         self.Rankings = {};
-        local aFilteredDonations = self:__GetDonationsWithinTime(aDonations);
+        ZLib.Debug:Print('Getting Donations Within Time.');
+        local aFilteredDonations = self:GetDonationsWithinTime(aDonations);
+        ZLib.Debug:Print('Calculating Points Table.');
         local tPoints = ZLM_Scoreboard.__CalculatePointsTable(aBounties);
-        if #tPoints > 0 then
+        if tPoints ~= nil and #tPoints > 0 then
             for _,v in ipairs(aFilteredDonations) do
                 tTempPoints[v.Name] = (tTempPoints[v.Name] or 0) + (tPoints[v.ItemId] * v.Quantity);
             end
